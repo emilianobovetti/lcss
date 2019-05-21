@@ -19,8 +19,9 @@ node_t;
 typedef struct tree
 {
     char *str;
-    int str_length;
+    int last_idx;
 
+    struct node *aux;
     struct node *root;
 }
 tree_t;
@@ -28,5 +29,7 @@ tree_t;
 node_t *new_node(int left, int right);
 
 node_t *new_leaf(int left);
+
+void print_tree(tree_t *tree);
 
 #endif

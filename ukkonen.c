@@ -30,17 +30,27 @@ typedef struct node_prev_sibling
 }
 node_prev_sibling_t;
 
-void find_tk_transition(char *str, node_t *start, int k, node_prev_sibling_t *res)
+void find_transition(tree_t *tree, node_t *node, char t, node_prev_sibling_t *res)
 {
-    node_t *child = start->first_child;
+    if (node == tree->aux)
+    {
+        res->prev_sibling = NULL;
+        res->node = tree->root;
+
+        return;
+    }
+
+    char *str = tree->str;
+
     node_t *prev = NULL;
+    node_t *child = node->first_child;
 
     while (child != NULL)
     {
-        if (str[child->left_label] == str[k])
+        if (str[child->left_label] == t)
         {
-            res->node = child;
             res->prev_sibling = prev;
+            res->node = child;
 
             return;
         }
@@ -61,7 +71,8 @@ void test_and_split(tree_t *tree, node_t *node, int k, int p, char t, node_endpo
     if (k <= p)
     {
         node_prev_sibling_t tk_search = { .node = NULL, .prev_sibling = NULL };
-        find_tk_transition(str, s, k, &tk_search);
+        find_transition(tree, s, str[k], &tk_search);
+
         // TODO: is sp always !NULL?
         node_t *sp = tk_search.node;
         int kp = sp->left_label;
@@ -77,7 +88,10 @@ void test_and_split(tree_t *tree, node_t *node, int k, int p, char t, node_endpo
             r->parent = s;
             r->first_child = r->last_child = sp;
             r->next_sibling = sp->next_sibling;
-            tk_search.prev_sibling->next_sibling = r;
+            if (tk_search.prev_sibling != NULL)
+            {
+                tk_search.prev_sibling->next_sibling = r;
+            }
 
             sp->left_label = kp + p - k + 1;
             sp->parent = r;
@@ -100,7 +114,7 @@ void test_and_split(tree_t *tree, node_t *node, int k, int p, char t, node_endpo
     else
     {
         node_prev_sibling_t tk_search = { .node = NULL, .prev_sibling = NULL };
-        find_tk_transition(str, s, p + 1, &tk_search);
+        find_transition(tree, s, str[p + 1], &tk_search);
 
         if (tk_search.node != NULL)
         {
@@ -123,7 +137,7 @@ void canonize(tree_t *tree, node_t *node, int k, int p, node_left_ptr_t *res)
     else
     {
         node_prev_sibling_t tk_search = { .node = NULL, .prev_sibling = NULL };
-        find_tk_transition(str, s, k, &tk_search);
+        find_transition(tree, s, str[k], &tk_search);
         kp = tk_search.node->left_label;
         pp = tk_search.node->right_label;
 
@@ -134,7 +148,7 @@ void canonize(tree_t *tree, node_t *node, int k, int p, node_left_ptr_t *res)
 
             if (k <= p)
             {
-                find_tk_transition(str, s, kp, &tk_search);
+                find_transition(tree, s, str[kp], &tk_search);
                 kp = tk_search.node->left_label;
                 pp = tk_search.node->right_label;
             }
@@ -145,14 +159,15 @@ void canonize(tree_t *tree, node_t *node, int k, int p, node_left_ptr_t *res)
     }
 }
 
-void update(tree_t *tree, node_t *start, int k, int i, node_left_ptr_t *res)
+void update(tree_t *tree, node_t *node, int k, int i, node_left_ptr_t *res)
 {
-    node_t *s = start;
+    node_t *s = node;
     node_t *oldr = tree->root;
+    char ti = tree->str[i];
 
     node_endpoint_t endp = { .node = NULL, .is_endpoint = false };
 
-    test_and_split(tree, s, k, i - 1, tree->str[i], &endp);
+    test_and_split(tree, s, k, i - 1, ti, &endp);
 
     while (!endp.is_endpoint)
     {
@@ -160,8 +175,16 @@ void update(tree_t *tree, node_t *start, int k, int i, node_left_ptr_t *res)
 
         node_t *rp = new_leaf(i);
         rp->parent = r;
-        r->last_child->next_sibling = rp;
-        r->last_child = rp;
+
+        if (r->last_child == NULL)
+        {
+            r->first_child = r->last_child = rp;
+        }
+        else
+        {
+            r->last_child->next_sibling = rp;
+            r->last_child = rp;
+        }
 
         if (oldr != tree->root)
         {
@@ -174,7 +197,7 @@ void update(tree_t *tree, node_t *start, int k, int i, node_left_ptr_t *res)
         s = suff.node;
         k = suff.left_ptr;
 
-        test_and_split(tree, s, k, i - 1, tree->str[i], &endp);
+        test_and_split(tree, s, k, i - 1, ti, &endp);
     }
 
     if (oldr != tree->root)
@@ -189,16 +212,23 @@ void update(tree_t *tree, node_t *start, int k, int i, node_left_ptr_t *res)
 tree_t *ukkonen(char *str)
 {
     /*
-     * `phase = 0 .. length(str)`
+     * `phase = 1 .. length(str)`
      */
-    int phase = 0;
-
-    node_t *root = new_node(0, 0);
+    int phase = 1;
 
     tree_t *tree = malloc(sizeof(tree_t));
+    node_t *aux = new_node(1, 0);
+    node_t *root = new_node(-1, -1);
+    node_t *fst_leaf = new_leaf(0);
+
     tree->str = str;
-    tree->str_length = 1;
+    tree->aux = aux;
     tree->root = root;
+    aux->first_child = aux->last_child = root;
+    root->parent = root->suffix_link = aux;
+
+    root->first_child = root->last_child = fst_leaf;
+    fst_leaf->parent = root;
 
     node_left_ptr_t s_k = { .node = root, .left_ptr = 1 };
 
@@ -209,14 +239,16 @@ tree_t *ukkonen(char *str)
         update(tree, s_k.node, s_k.left_ptr, phase, &s_k);
         canonize(tree, s_k.node, s_k.left_ptr, phase, &s_k);
 
-        tree->str_length++;
         phase++;
     }
+
+    tree->last_idx = phase - 1;
 
     return tree;
 }
 
 void main(void)
 {
-    ukkonen("hello, world");
+    tree_t *tree = ukkonen("a");
+    print_tree(tree);
 }
