@@ -72,8 +72,6 @@ void test_and_split(tree_t *tree, node_t *node, int k, int p, char t, node_endpo
     {
         node_prev_sibling_t tk_search = { .node = NULL, .prev_sibling = NULL };
         find_transition(tree, s, str[k], &tk_search);
-
-        // TODO: is sp always !NULL?
         node_t *sp = tk_search.node;
         int kp = sp->left_label;
 
@@ -114,7 +112,7 @@ void test_and_split(tree_t *tree, node_t *node, int k, int p, char t, node_endpo
     else
     {
         node_prev_sibling_t tk_search = { .node = NULL, .prev_sibling = NULL };
-        find_transition(tree, s, str[p + 1], &tk_search);
+        find_transition(tree, s, t, &tk_search);
 
         if (tk_search.node != NULL)
         {
@@ -148,7 +146,7 @@ void canonize(tree_t *tree, node_t *node, int k, int p, node_left_ptr_t *res)
 
             if (k <= p)
             {
-                find_transition(tree, s, str[kp], &tk_search);
+                find_transition(tree, s, str[k], &tk_search);
                 kp = tk_search.node->left_label;
                 pp = tk_search.node->right_label;
             }
@@ -234,8 +232,6 @@ tree_t *ukkonen(char *str)
 
     while (str[phase - 1] != '\0')
     {
-        printf("phase: %d\n", phase);
-
         update(tree, s_k.node, s_k.left_ptr, phase, &s_k);
         canonize(tree, s_k.node, s_k.left_ptr, phase, &s_k);
 
@@ -249,6 +245,6 @@ tree_t *ukkonen(char *str)
 
 void main(void)
 {
-    tree_t *tree = ukkonen("a");
+    tree_t *tree = ukkonen("abcabx");
     print_tree(tree);
 }

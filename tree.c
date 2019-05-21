@@ -1,5 +1,6 @@
 #include <limits.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 #include "tree.h"
 
@@ -36,52 +37,61 @@ node_t *new_leaf(int left)
     return n;
 }
 
+#define RIGHT_LABEL(n)
+
+int get_right_label(tree_t *tree, node_t *node)
+{
+    int right_label = node->right_label;
+
+    return right_label == INT_MAX ? tree->last_idx : right_label;
+}
+
+bool is_empty_leaf(tree_t *tree, node_t *node)
+{
+    int right_label = get_right_label(tree, node);
+
+    return node != tree->root && node->left_label == right_label && tree->str[right_label] == '\0';
+}
+
 void print_label(tree_t *tree, node_t *node)
 {
-    if (node == tree->root)
+    if (node == tree->aux)
     {
-        printf("root");
-
+        printf("aux");
         return;
     }
 
-    int right_label = (node->right_label == INT_MAX) ? tree->last_idx : node->right_label;
+    if (node == tree->root)
+    {
+        printf("root");
+        return;
+    }
+
+    int right_label = get_right_label(tree, node);
 
     for (int i = node->left_label; i <= right_label; i++)
     {
-        char c = tree->str[i];
-        putchar(c == '\0' ? '$' : c);
+        putchar(tree->str[i] == '\0' ? '$' : tree->str[i]);
     }
 
-    printf(" [%d %d]", node->left_label, right_label);
+    printf(" [%d %d]", node->left_label + 1, right_label + 1);
 }
 
 void print_node(tree_t *tree, node_t *node)
 {
+    printf("\n");
+    print_label(tree, node->parent);
+    printf(" -> ");
     print_label(tree, node);
 
-    node_t *sibling;
-
-    for (sibling = node->next_sibling; sibling != NULL; sibling = sibling->next_sibling)
+    if (node->next_sibling != NULL)
     {
-        printf(" - ");
-        print_label(tree, sibling);
+        print_node(tree, node->next_sibling);
     }
 
     if (node->first_child != NULL)
     {
-        printf("\nchildren of ");
-        print_label(tree, node);
-        printf("\n");
         print_node(tree, node->first_child);
-    }
-
-    for (sibling = node->next_sibling; sibling != NULL; sibling = sibling->next_sibling)
-    {
-        printf("\nsiblings of ");
-        print_label(tree, node);
-        printf("\n");
-        print_node(tree, sibling);
     }
 }
 
