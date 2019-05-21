@@ -1,39 +1,36 @@
+#include <limits.h>
+
 #include "tree.h"
 
-node_t *new_node(void)
+
+node_t *new_node(int left, int right)
 {
-    substring_t *s = malloc(sizeof(substring_t));
     node_t *n = malloc(sizeof(node_t));
 
-    s->left = 0;
-    s->right = 0;
-
-    n->edge_label = *s;
+    n->left_label = left;
+    n->right_label = right;
 
     n->parent =
     n->suffix_link =
     n->first_child =
     n->last_child =
-    n->first_sibling = NULL;
+    n->next_sibling = NULL;
 
     return n;
 }
 
-node_t *new_leaf(size_t left_label)
+node_t *new_leaf(int left)
 {
-    substring_t *s = malloc(sizeof(substring_t));
     node_t *n = malloc(sizeof(node_t));
 
-    s->left = left_label;
+    n->left_label = left;
     // open transition
-    s->right = -1;
-
-    n->edge_label = *s;
+    n->right_label = INT_MAX;
 
     n->parent =
     n->suffix_link =
     n->first_child =
-    n->first_sibling = NULL;
+    n->next_sibling = NULL;
 
     return n;
 }
