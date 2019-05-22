@@ -30,7 +30,7 @@ typedef struct node_prev_sibling
 }
 node_prev_sibling_t;
 
-void find_transition(tree_t *tree, node_t *node, char t, node_prev_sibling_t *res)
+void find_transition_and_sibling(tree_t *tree, node_t *node, char t, node_prev_sibling_t *res)
 {
     if (node == tree->aux)
     {
@@ -60,6 +60,14 @@ void find_transition(tree_t *tree, node_t *node, char t, node_prev_sibling_t *re
     }
 }
 
+node_t *find_transition(tree_t *tree, node_t *node, char t)
+{
+    node_prev_sibling_t tk_search = { .node = NULL, .prev_sibling = NULL };
+    find_transition_and_sibling(tree, node, t, &tk_search);
+
+    return tk_search.node;
+}
+
 void test_and_split(tree_t *tree, node_t *node, int k, int p, char t, node_endpoint_t *res)
 {
     char *str = tree->str;
@@ -71,7 +79,7 @@ void test_and_split(tree_t *tree, node_t *node, int k, int p, char t, node_endpo
     if (k <= p)
     {
         node_prev_sibling_t tk_search = { .node = NULL, .prev_sibling = NULL };
-        find_transition(tree, s, str[k], &tk_search);
+        find_transition_and_sibling(tree, s, str[k], &tk_search);
         node_t *sp = tk_search.node;
         int kp = sp->left_label;
 
@@ -111,10 +119,7 @@ void test_and_split(tree_t *tree, node_t *node, int k, int p, char t, node_endpo
     }
     else
     {
-        node_prev_sibling_t tk_search = { .node = NULL, .prev_sibling = NULL };
-        find_transition(tree, s, t, &tk_search);
-
-        if (tk_search.node != NULL)
+        if (find_transition(tree, s, t) != NULL)
         {
             res->is_endpoint = true;
         }
@@ -134,21 +139,20 @@ void canonize(tree_t *tree, node_t *node, int k, int p, node_left_ptr_t *res)
     }
     else
     {
-        node_prev_sibling_t tk_search = { .node = NULL, .prev_sibling = NULL };
-        find_transition(tree, s, str[k], &tk_search);
-        kp = tk_search.node->left_label;
-        pp = tk_search.node->right_label;
+        node_t *tk_transition = find_transition(tree, s, str[k]);
+        kp = tk_transition->left_label;
+        pp = tk_transition->right_label;
 
         while (pp - kp <= p - k)
         {
             k = k + pp - kp + 1;
-            s = tk_search.node;
+            s = tk_transition;
 
             if (k <= p)
             {
-                find_transition(tree, s, str[k], &tk_search);
-                kp = tk_search.node->left_label;
-                pp = tk_search.node->right_label;
+                tk_transition = find_transition(tree, s, str[k]);
+                kp = tk_transition->left_label;
+                pp = tk_transition->right_label;
             }
         }
 
@@ -245,6 +249,6 @@ tree_t *ukkonen(char *str)
 
 void main(void)
 {
-    tree_t *tree = ukkonen("abcabx");
+    tree_t *tree = ukkonen("abcabxabcd");
     print_tree(tree);
 }
