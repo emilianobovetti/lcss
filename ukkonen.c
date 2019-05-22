@@ -5,8 +5,7 @@
 #include <limits.h>
 
 #include "tree.h"
-
-#define CHECK_NULL(p) if ((p) == NULL) { printf("NULL\n"); }
+#include "debug.h"
 
 typedef struct node_left_ptr
 {
@@ -89,7 +88,7 @@ void test_and_split(tree_t *tree, node_t *node, int k, int p, char t, node_endpo
         }
         else
         {
-            node_t *r = new_node(tree, kp, kp + p - k);
+            node_t *r = new_node(kp, kp + p - k);
 
             r->parent = s;
             r->first_child = r->last_child = sp;
@@ -102,8 +101,9 @@ void test_and_split(tree_t *tree, node_t *node, int k, int p, char t, node_endpo
 
             sp->left_label = kp + p - k + 1;
             sp->parent = r;
-            sp->first_child = sp->last_child = NULL;
             sp->next_sibling = NULL;
+
+            CHECK_NULL(s->first_child);
 
             if (s->first_child == sp)
             {
@@ -230,6 +230,8 @@ tree_t *build_tree(char *str)
 
     tree->last_idx = phase - 1;
 
+    post_process_tree(tree);
+
     return tree;
 }
 
@@ -258,7 +260,8 @@ void main(void)
     {
         if (!is_end_sym(end_sym))
         {
-            fprintf(stderr, "too many strings\n");
+            fprintf(stderr, "Too many strings\n");
+            fprintf(stderr, "I can handle just %d strings\n", UCHAR_MAX - SCHAR_MAX);
             fprintf(stderr, "(char '%d' isn't a valid end symbol)\n", end_sym);
             return;
         }
@@ -281,8 +284,9 @@ void main(void)
     // don't forget to bring a towel
     cat[cat_idx] = '\0';
 
-    printf("%s\n", cat);
-
     tree_t *tree = build_tree(cat);
     print_tree(tree);
+
+    // TODO
+    //print_tree(build_tree("111222"));
 }

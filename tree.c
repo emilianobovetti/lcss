@@ -1,12 +1,12 @@
-#include <limits.h>
-#include <stdio.h>
-#include <stdbool.h>
-
 #include "tree.h"
 
-node_t *new_node(tree_t *tree, int left, int right)
+#define LABEL_LENGTH(n) ((n)->right_label - (n)->left_label + 1)
+
+node_t *new_node(int left, int right)
 {
     node_t *n = malloc(sizeof(node_t));
+
+    n->depth = -1;
 
     n->left_label = left;
     n->right_label = right;
@@ -24,6 +24,8 @@ node_t *new_leaf(tree_t *tree, int left)
 {
     node_t *n = malloc(sizeof(node_t));
 
+    n->depth = -1;
+
     n->left_label = left;
     // open transition
     n->right_label = INT_MAX;
@@ -33,17 +35,21 @@ node_t *new_leaf(tree_t *tree, int left)
     n->first_child =
     n->next_sibling = NULL;
 
+    tree->num_leaves++;
+
     return n;
 }
 
 tree_t *new_tree(char *str)
 {
     tree_t *tree = malloc(sizeof(tree_t));
-    node_t *aux = new_node(tree, 1, 0);
-    node_t *root = new_node(tree, -1, -1);
+    node_t *aux = new_node(1, 0);
+    node_t *root = new_node(-1, -1);
 
     tree->str = str;
     tree->last_idx = 0;
+
+    tree->num_leaves = 0;
 
     tree->aux = aux;
     tree->root = root;
@@ -54,72 +60,38 @@ tree_t *new_tree(char *str)
     return tree;
 }
 
-
-int get_right_label(tree_t *tree, node_t *node)
-{
-    int right_label = node->right_label;
-
-    return right_label == INT_MAX ? tree->last_idx : right_label;
-}
-
 bool is_end_sym(char c)
 {
     return c <= 31 || c >= SCHAR_MAX;
 }
 
-void print_label(tree_t *tree, node_t *node)
+void post_process_node(tree_t *tree, node_t *node)
 {
-    if (node == tree->aux)
+    if (node == NULL)
     {
-        printf("aux");
         return;
     }
 
-    if (node == tree->root)
+    char *str = tree->str;
+
+    for (int i = node->left_label; i <= node->right_label; i++)
     {
-        printf("root");
-        return;
-    }
-
-    int right_label = get_right_label(tree, node);
-
-    for (int i = node->left_label; i <= right_label; i++)
-    {
-        char c = tree->str[i];
-
-        if (is_end_sym(c))
+        if (is_end_sym(str[i]))
         {
-            printf("$%d", -c);
-        }
-        else
-        {
-            putchar(c);
+            node->right_label = i;
+            break;
         }
     }
 
-    printf(" [%d %d]", node->left_label + 1, right_label + 1);
+    node->depth = node->parent->depth + LABEL_LENGTH(node);
+
+    post_process_node(tree, node->first_child);
+    post_process_node(tree, node->next_sibling);
 }
 
-void print_node(tree_t *tree, node_t *node)
+void post_process_tree(tree_t *tree)
 {
-    printf("\n");
-    print_label(tree, node->parent);
-    printf(" -> ");
-    print_label(tree, node);
+    tree->root->depth = 0;
 
-    if (node->next_sibling != NULL)
-    {
-        print_node(tree, node->next_sibling);
-    }
-
-    if (node->first_child != NULL)
-    {
-        print_node(tree, node->first_child);
-    }
-}
-
-void print_tree(tree_t *tree)
-{
-    print_node(tree, tree->root);
-    printf("\n");
+    post_process_node(tree, tree->root);
 }
