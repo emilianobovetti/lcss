@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <string.h>
 
 #include "tree.h"
 
@@ -30,7 +31,7 @@ typedef struct node_prev_sibling
 }
 node_prev_sibling_t;
 
-void find_transition_and_sibling(tree_t *tree, node_t *node, char t, node_prev_sibling_t *res)
+void find_transition_and_prev(tree_t *tree, node_t *node, char t, node_prev_sibling_t *res)
 {
     if (node == tree->aux)
     {
@@ -40,14 +41,12 @@ void find_transition_and_sibling(tree_t *tree, node_t *node, char t, node_prev_s
         return;
     }
 
-    char *str = tree->cur_string;
-
     node_t *prev = NULL;
     node_t *child = node->first_child;
 
     while (child != NULL)
     {
-        if (str[child->left_label] == t)
+        if (tree->str[child->left_label] == t)
         {
             res->prev_sibling = prev;
             res->node = child;
@@ -62,15 +61,15 @@ void find_transition_and_sibling(tree_t *tree, node_t *node, char t, node_prev_s
 
 node_t *find_transition(tree_t *tree, node_t *node, char t)
 {
-    node_prev_sibling_t tk_search = { .node = NULL, .prev_sibling = NULL };
-    find_transition_and_sibling(tree, node, t, &tk_search);
+    node_prev_sibling_t t_search = { .node = NULL, .prev_sibling = NULL };
+    find_transition_and_prev(tree, node, t, &t_search);
 
-    return tk_search.node;
+    return t_search.node;
 }
 
 void test_and_split(tree_t *tree, node_t *node, int k, int p, char t, node_endpoint_t *res)
 {
-    char *str = tree->cur_string;
+    char *str = tree->str;
     node_t *s = node;
 
     res->node = s;
@@ -78,9 +77,9 @@ void test_and_split(tree_t *tree, node_t *node, int k, int p, char t, node_endpo
 
     if (k <= p)
     {
-        node_prev_sibling_t tk_search = { .node = NULL, .prev_sibling = NULL };
-        find_transition_and_sibling(tree, s, str[k], &tk_search);
-        node_t *sp = tk_search.node;
+        node_prev_sibling_t t_search = { .node = NULL, .prev_sibling = NULL };
+        find_transition_and_prev(tree, s, str[k], &t_search);
+        node_t *sp = t_search.node;
         int kp = sp->left_label;
 
         if (t == str[kp + p - k + 1])
@@ -89,14 +88,15 @@ void test_and_split(tree_t *tree, node_t *node, int k, int p, char t, node_endpo
         }
         else
         {
-            node_t *r = new_node(kp, kp + p - k);
+            node_t *r = new_node(tree, kp, kp + p - k);
 
             r->parent = s;
             r->first_child = r->last_child = sp;
             r->next_sibling = sp->next_sibling;
-            if (tk_search.prev_sibling != NULL)
+
+            if (t_search.prev_sibling != NULL)
             {
-                tk_search.prev_sibling->next_sibling = r;
+                t_search.prev_sibling->next_sibling = r;
             }
 
             sp->left_label = kp + p - k + 1;
@@ -129,7 +129,7 @@ void test_and_split(tree_t *tree, node_t *node, int k, int p, char t, node_endpo
 void canonize(tree_t *tree, node_t *node, int k, int p, node_left_ptr_t *res)
 {
     node_t *s = node;
-    char *str = tree->cur_string;
+    char *str = tree->str;
     int kp, pp;
 
     if (p < k)
@@ -165,17 +165,17 @@ void update(tree_t *tree, node_t *node, int k, int i, node_left_ptr_t *res)
 {
     node_t *s = node;
     node_t *oldr = tree->root;
-    char ti = tree->cur_string[i];
+    char ti = tree->str[i];
 
-    node_endpoint_t endp = { .node = NULL, .is_endpoint = false };
+    node_endpoint_t split = { .node = NULL, .is_endpoint = false };
 
-    test_and_split(tree, s, k, i - 1, ti, &endp);
+    test_and_split(tree, s, k, i - 1, ti, &split);
 
-    while (!endp.is_endpoint)
+    while (!split.is_endpoint)
     {
-        node_t *r = endp.node;
+        node_t *r = split.node;
 
-        node_t *rp = new_leaf(i);
+        node_t *rp = new_leaf(tree, i);
         rp->parent = r;
 
         if (r->last_child == NULL)
@@ -199,7 +199,7 @@ void update(tree_t *tree, node_t *node, int k, int i, node_left_ptr_t *res)
         s = suff.node;
         k = suff.left_ptr;
 
-        test_and_split(tree, s, k, i - 1, ti, &endp);
+        test_and_split(tree, s, k, i - 1, ti, &split);
     }
 
     if (oldr != tree->root)
@@ -211,23 +211,15 @@ void update(tree_t *tree, node_t *node, int k, int i, node_left_ptr_t *res)
     res->left_ptr = k;
 }
 
-tree_t *ukkonen(char *str)
+tree_t *build_tree(char *str)
 {
-    /*
-     * `phase = 1 .. length(str)`
-     */
-    int phase = 1;
+    tree_t *tree = new_tree(str);
 
-    tree_t *tree = new_tree();
-    tree->cur_string = str;
+    node_left_ptr_t s_k = { .node = tree->root, .left_ptr = 0 };
 
-    node_t *fst_leaf = new_leaf(0);
-    tree->root->first_child = tree->root->last_child = fst_leaf;
-    fst_leaf->parent = tree->root;
+    int phase = 0;
 
-    node_left_ptr_t s_k = { .node = tree->root, .left_ptr = 1 };
-
-    while (str[phase - 1] != '\0')
+    while (str[phase] != '\0')
     {
         update(tree, s_k.node, s_k.left_ptr, phase, &s_k);
         canonize(tree, s_k.node, s_k.left_ptr, phase, &s_k);
@@ -240,32 +232,55 @@ tree_t *ukkonen(char *str)
     return tree;
 }
 
-void add_string(tree_t *tree, char *str)
-{
-    tree->cur_string = str;
-
-    node_left_ptr_t s_k = { .node = tree->root, .left_ptr = 0 };
-
-    int phase = 0;
-
-    do
-    {
-        update(tree, s_k.node, s_k.left_ptr, phase, &s_k);
-        canonize(tree, s_k.node, s_k.left_ptr, phase, &s_k);
-
-        phase++;
-    }
-    while (str[phase - 1] != '\0');
-
-    tree->last_idx = phase - 1;
-}
-
 void main(void)
 {
-    tree_t *t1 = ukkonen("abcabxabcd");
-    print_tree(t1);
+    char *strings[] = {
+        "xabxa",
+        "babxba",
+        NULL
+    };
 
-    tree_t *t2 = new_tree();
-    add_string(t2, "abcabxabcd");
-    print_tree(t2);
+    // 1 for \0
+    size_t total_len = 1;
+
+    for (size_t i = 0; strings[i] != NULL; i++)
+    {
+        // +1 for str unique end symbol
+        total_len += strlen(strings[i]) + 1;
+    }
+
+    char *cat = calloc(total_len, sizeof(char));
+    size_t cat_idx = 0;
+    char end_sym = 200;
+
+    for (size_t i = 0; strings[i] != NULL; i++)
+    {
+        if (!is_end_sym(end_sym))
+        {
+            fprintf(stderr, "too many strings\n");
+            return;
+        }
+
+        char *cur_str = strings[i];
+        size_t j = 0;
+
+        while (cur_str[j] != '\0')
+        {
+            cat[cat_idx] = cur_str[j];
+
+            cat_idx++;
+            j++;
+        }
+
+        cat[cat_idx] = end_sym--;
+        cat_idx++;
+    }
+
+    // don't forget to bring a towel
+    cat[cat_idx] = '\0';
+
+    printf("%s\n", cat);
+
+    tree_t *tree = build_tree(cat);
+    print_tree(tree);
 }

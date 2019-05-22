@@ -4,8 +4,7 @@
 
 #include "tree.h"
 
-
-node_t *new_node(int left, int right)
+node_t *new_node(tree_t *tree, int left, int right)
 {
     node_t *n = malloc(sizeof(node_t));
 
@@ -21,7 +20,7 @@ node_t *new_node(int left, int right)
     return n;
 }
 
-node_t *new_leaf(int left)
+node_t *new_leaf(tree_t *tree, int left)
 {
     node_t *n = malloc(sizeof(node_t));
 
@@ -37,21 +36,24 @@ node_t *new_leaf(int left)
     return n;
 }
 
-tree_t *new_tree(void)
+tree_t *new_tree(char *str)
 {
     tree_t *tree = malloc(sizeof(tree_t));
-    node_t *aux = new_node(1, 0);
-    node_t *root = new_node(-1, -1);
+    node_t *aux = new_node(tree, 1, 0);
+    node_t *root = new_node(tree, -1, -1);
+
+    tree->str = str;
+    tree->last_idx = 0;
 
     tree->aux = aux;
     tree->root = root;
-    tree->cur_string = NULL;
     aux->first_child = aux->last_child = root;
     root->parent = root->suffix_link = aux;
     root->first_child = root->last_child = NULL;
 
     return tree;
 }
+
 
 int get_right_label(tree_t *tree, node_t *node)
 {
@@ -60,11 +62,9 @@ int get_right_label(tree_t *tree, node_t *node)
     return right_label == INT_MAX ? tree->last_idx : right_label;
 }
 
-bool is_empty_leaf(tree_t *tree, node_t *node)
+bool is_end_sym(char c)
 {
-    int right_label = get_right_label(tree, node);
-
-    return node != tree->root && node->left_label == right_label && tree->cur_string[right_label] == '\0';
+    return c < 32 || c > 126;
 }
 
 void print_label(tree_t *tree, node_t *node)
@@ -85,7 +85,14 @@ void print_label(tree_t *tree, node_t *node)
 
     for (int i = node->left_label; i <= right_label; i++)
     {
-        putchar(tree->cur_string[i] == '\0' ? '$' : tree->cur_string[i]);
+        if (tree->str[i] == '\0')
+        {
+            printf("$%d", '\0'); //TODO
+        }
+        else
+        {
+            putchar(tree->str[i]);
+        }
     }
 
     printf(" [%d %d]", node->left_label + 1, right_label + 1);
