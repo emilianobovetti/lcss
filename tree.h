@@ -18,7 +18,7 @@ node_t;
 
 typedef struct tree
 {
-    char *str;
+    char *cur_string;
     int last_idx;
 
     struct node *aux;

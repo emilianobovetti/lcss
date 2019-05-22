@@ -40,7 +40,7 @@ void find_transition_and_sibling(tree_t *tree, node_t *node, char t, node_prev_s
         return;
     }
 
-    char *str = tree->str;
+    char *str = tree->cur_string;
 
     node_t *prev = NULL;
     node_t *child = node->first_child;
@@ -70,7 +70,7 @@ node_t *find_transition(tree_t *tree, node_t *node, char t)
 
 void test_and_split(tree_t *tree, node_t *node, int k, int p, char t, node_endpoint_t *res)
 {
-    char *str = tree->str;
+    char *str = tree->cur_string;
     node_t *s = node;
 
     res->node = s;
@@ -129,7 +129,7 @@ void test_and_split(tree_t *tree, node_t *node, int k, int p, char t, node_endpo
 void canonize(tree_t *tree, node_t *node, int k, int p, node_left_ptr_t *res)
 {
     node_t *s = node;
-    char *str = tree->str;
+    char *str = tree->cur_string;
     int kp, pp;
 
     if (p < k)
@@ -165,7 +165,7 @@ void update(tree_t *tree, node_t *node, int k, int i, node_left_ptr_t *res)
 {
     node_t *s = node;
     node_t *oldr = tree->root;
-    char ti = tree->str[i];
+    char ti = tree->cur_string[i];
 
     node_endpoint_t endp = { .node = NULL, .is_endpoint = false };
 
@@ -219,7 +219,11 @@ tree_t *ukkonen(char *str)
     int phase = 1;
 
     tree_t *tree = new_tree();
-    tree->str = str;
+    tree->cur_string = str;
+
+    node_t *fst_leaf = new_leaf(0);
+    tree->root->first_child = tree->root->last_child = fst_leaf;
+    fst_leaf->parent = tree->root;
 
     node_left_ptr_t s_k = { .node = tree->root, .left_ptr = 1 };
 
@@ -236,8 +240,32 @@ tree_t *ukkonen(char *str)
     return tree;
 }
 
+void add_string(tree_t *tree, char *str)
+{
+    tree->cur_string = str;
+
+    node_left_ptr_t s_k = { .node = tree->root, .left_ptr = 0 };
+
+    int phase = 0;
+
+    do
+    {
+        update(tree, s_k.node, s_k.left_ptr, phase, &s_k);
+        canonize(tree, s_k.node, s_k.left_ptr, phase, &s_k);
+
+        phase++;
+    }
+    while (str[phase] != '\0');
+
+    tree->last_idx = phase - 1;
+}
+
 void main(void)
 {
-    tree_t *tree = ukkonen("abcabxabcd");
-    print_tree(tree);
+    tree_t *t1 = ukkonen("abcabxabcd");
+    print_tree(t1);
+
+    tree_t *t2 = new_tree();
+    add_string(t2, "abcabxabcd");
+    print_tree(t2);
 }

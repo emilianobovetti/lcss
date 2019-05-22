@@ -42,15 +42,13 @@ tree_t *new_tree(void)
     tree_t *tree = malloc(sizeof(tree_t));
     node_t *aux = new_node(1, 0);
     node_t *root = new_node(-1, -1);
-    node_t *fst_leaf = new_leaf(0);
 
     tree->aux = aux;
     tree->root = root;
+    tree->cur_string = NULL;
     aux->first_child = aux->last_child = root;
     root->parent = root->suffix_link = aux;
-
-    root->first_child = root->last_child = fst_leaf;
-    fst_leaf->parent = root;
+    root->first_child = root->last_child = NULL;
 
     return tree;
 }
@@ -66,7 +64,7 @@ bool is_empty_leaf(tree_t *tree, node_t *node)
 {
     int right_label = get_right_label(tree, node);
 
-    return node != tree->root && node->left_label == right_label && tree->str[right_label] == '\0';
+    return node != tree->root && node->left_label == right_label && tree->cur_string[right_label] == '\0';
 }
 
 void print_label(tree_t *tree, node_t *node)
@@ -87,7 +85,7 @@ void print_label(tree_t *tree, node_t *node)
 
     for (int i = node->left_label; i <= right_label; i++)
     {
-        putchar(tree->str[i] == '\0' ? '$' : tree->str[i]);
+        putchar(tree->cur_string[i] == '\0' ? '$' : tree->cur_string[i]);
     }
 
     printf(" [%d %d]", node->left_label + 1, right_label + 1);
