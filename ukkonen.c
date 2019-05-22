@@ -176,8 +176,9 @@ void update(tree_t *tree, node_t *node, int k, int i, node_left_ptr_t *res)
     {
         node_t *r = split.node;
 
-        node_t *rp = new_leaf(tree, i);
+        node_t *rp = new_leaf(i);
         rp->parent = r;
+        update_num_leaves(r);
 
         if (r->last_child == NULL)
         {
@@ -212,9 +213,9 @@ void update(tree_t *tree, node_t *node, int k, int i, node_left_ptr_t *res)
     res->left_ptr = k;
 }
 
-tree_t *build_tree(char *str)
+tree_t *build_tree(char *str, int num_strings)
 {
-    tree_t *tree = new_tree(str);
+    tree_t *tree = new_tree(str, num_strings);
 
     node_left_ptr_t s_k = { .node = tree->root, .left_ptr = 0 };
 
@@ -231,6 +232,7 @@ tree_t *build_tree(char *str)
     tree->last_idx = phase - 1;
 
     post_process_tree(tree);
+    process_leaves_pair(tree);
 
     return tree;
 }
@@ -238,25 +240,27 @@ tree_t *build_tree(char *str)
 void main(void)
 {
     char *strings[] = {
-        "xabxa",
-        "babxba",
+        "11111",
+        "11111",
         NULL
     };
+
+    int n_str;
 
     // 1 for \0
     size_t total_len = 1;
 
-    for (size_t i = 0; strings[i] != NULL; i++)
+    for (n_str = 0; strings[n_str] != NULL; n_str++)
     {
         // +1 for str unique end symbol
-        total_len += strlen(strings[i]) + 1;
+        total_len += strlen(strings[n_str]) + 1;
     }
 
     char *cat = calloc(total_len, sizeof(char));
     size_t cat_idx = 0;
     char end_sym = UCHAR_MAX;
 
-    for (size_t i = 0; strings[i] != NULL; i++)
+    for (n_str = 0; strings[n_str] != NULL; n_str++)
     {
         if (!is_end_sym(end_sym))
         {
@@ -266,7 +270,7 @@ void main(void)
             return;
         }
 
-        char *cur_str = strings[i];
+        char *cur_str = strings[n_str];
         size_t j = 0;
 
         while (cur_str[j] != '\0')
@@ -284,6 +288,6 @@ void main(void)
     // don't forget to bring a towel
     cat[cat_idx] = '\0';
 
-    tree_t *tree = build_tree(cat);
+    tree_t *tree = build_tree(cat, n_str);
     print_tree(tree);
 }

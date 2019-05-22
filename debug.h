@@ -9,6 +9,8 @@ void print_label(tree_t *tree, node_t *node);
 
 void print_node(tree_t *tree, node_t *node);
 
+void print_leaves_matrix(tree_t *tree);
+
 void print_tree(tree_t *tree);
 
 #endif
