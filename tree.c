@@ -64,7 +64,7 @@ int get_right_label(tree_t *tree, node_t *node)
 
 bool is_end_sym(char c)
 {
-    return c < 32 || c > 126;
+    return c <= 31 || c >= SCHAR_MAX;
 }
 
 void print_label(tree_t *tree, node_t *node)
@@ -85,13 +85,15 @@ void print_label(tree_t *tree, node_t *node)
 
     for (int i = node->left_label; i <= right_label; i++)
     {
-        if (tree->str[i] == '\0')
+        char c = tree->str[i];
+
+        if (is_end_sym(c))
         {
-            printf("$%d", '\0'); //TODO
+            printf("$%d", -c);
         }
         else
         {
-            putchar(tree->str[i]);
+            putchar(c);
         }
     }
 

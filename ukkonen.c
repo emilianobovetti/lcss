@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
+#include <limits.h>
 
 #include "tree.h"
 
@@ -251,13 +252,14 @@ void main(void)
 
     char *cat = calloc(total_len, sizeof(char));
     size_t cat_idx = 0;
-    char end_sym = 200;
+    char end_sym = UCHAR_MAX;
 
     for (size_t i = 0; strings[i] != NULL; i++)
     {
         if (!is_end_sym(end_sym))
         {
             fprintf(stderr, "too many strings\n");
+            fprintf(stderr, "(char '%d' isn't a valid end symbol)\n", end_sym);
             return;
         }
 
