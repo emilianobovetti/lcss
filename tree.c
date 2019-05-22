@@ -37,7 +37,23 @@ node_t *new_leaf(int left)
     return n;
 }
 
-#define RIGHT_LABEL(n)
+tree_t *new_tree(void)
+{
+    tree_t *tree = malloc(sizeof(tree_t));
+    node_t *aux = new_node(1, 0);
+    node_t *root = new_node(-1, -1);
+    node_t *fst_leaf = new_leaf(0);
+
+    tree->aux = aux;
+    tree->root = root;
+    aux->first_child = aux->last_child = root;
+    root->parent = root->suffix_link = aux;
+
+    root->first_child = root->last_child = fst_leaf;
+    fst_leaf->parent = root;
+
+    return tree;
+}
 
 int get_right_label(tree_t *tree, node_t *node)
 {

@@ -218,21 +218,10 @@ tree_t *ukkonen(char *str)
      */
     int phase = 1;
 
-    tree_t *tree = malloc(sizeof(tree_t));
-    node_t *aux = new_node(1, 0);
-    node_t *root = new_node(-1, -1);
-    node_t *fst_leaf = new_leaf(0);
-
+    tree_t *tree = new_tree();
     tree->str = str;
-    tree->aux = aux;
-    tree->root = root;
-    aux->first_child = aux->last_child = root;
-    root->parent = root->suffix_link = aux;
 
-    root->first_child = root->last_child = fst_leaf;
-    fst_leaf->parent = root;
-
-    node_left_ptr_t s_k = { .node = root, .left_ptr = 1 };
+    node_left_ptr_t s_k = { .node = tree->root, .left_ptr = 1 };
 
     while (str[phase - 1] != '\0')
     {

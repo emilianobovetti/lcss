@@ -30,6 +30,8 @@ node_t *new_node(int left, int right);
 
 node_t *new_leaf(int left);
 
+tree_t *new_tree(void);
+
 void print_tree(tree_t *tree);
 
 #endif
