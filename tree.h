@@ -10,6 +10,7 @@ typedef struct node
 {
     int left_label, right_label;
 
+    int idx;
     int depth;
 
     struct node *parent;
@@ -27,6 +28,8 @@ typedef struct tree
     int last_idx;
 
     int num_leaves;
+    int cur_leaf_idx;
+    int cur_node_idx;
 
     struct node *aux;
     struct node *root;

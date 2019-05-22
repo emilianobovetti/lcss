@@ -52,7 +52,7 @@ void print_label(tree_t *tree, node_t *node)
         printf("[%d %d]", node->left_label, node->right_label);
     }
 
-    printf(" %d", node);
+    printf(" %d", node->idx);
     //printf(" d(%d)", node->depth);
 }
 

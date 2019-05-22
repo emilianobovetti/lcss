@@ -261,7 +261,7 @@ void main(void)
         if (!is_end_sym(end_sym))
         {
             fprintf(stderr, "Too many strings\n");
-            fprintf(stderr, "I can handle just %d strings\n", UCHAR_MAX - SCHAR_MAX);
+            fprintf(stderr, "I can't handle more than %d strings :(\n", UCHAR_MAX - SCHAR_MAX);
             fprintf(stderr, "(char '%d' isn't a valid end symbol)\n", end_sym);
             return;
         }
@@ -286,7 +286,4 @@ void main(void)
 
     tree_t *tree = build_tree(cat);
     print_tree(tree);
-
-    // TODO
-    //print_tree(build_tree("111222"));
 }

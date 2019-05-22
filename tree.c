@@ -6,6 +6,7 @@ node_t *new_node(int left, int right)
 {
     node_t *n = malloc(sizeof(node_t));
 
+    n->idx = INT_MIN;
     n->depth = -1;
 
     n->left_label = left;
@@ -24,6 +25,7 @@ node_t *new_leaf(tree_t *tree, int left)
 {
     node_t *n = malloc(sizeof(node_t));
 
+    n->idx = INT_MAX;
     n->depth = -1;
 
     n->left_label = left;
@@ -50,6 +52,8 @@ tree_t *new_tree(char *str)
     tree->last_idx = 0;
 
     tree->num_leaves = 0;
+    tree->cur_leaf_idx = 0;
+    tree->cur_node_idx = -1;
 
     tree->aux = aux;
     tree->root = root;
@@ -85,7 +89,16 @@ void post_process_node(tree_t *tree, node_t *node)
 
     node->depth = node->parent->depth + LABEL_LENGTH(node);
 
-    post_process_node(tree, node->first_child);
+    if (node->first_child == NULL)
+    {
+        node->idx = tree->cur_leaf_idx++;
+    }
+    else
+    {
+        node->idx = tree->cur_node_idx--;
+        post_process_node(tree, node->first_child);
+    }
+
     post_process_node(tree, node->next_sibling);
 }
 
