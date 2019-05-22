@@ -255,7 +255,7 @@ void add_string(tree_t *tree, char *str)
 
         phase++;
     }
-    while (str[phase] != '\0');
+    while (str[phase - 1] != '\0');
 
     tree->last_idx = phase - 1;
 }
