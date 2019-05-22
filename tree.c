@@ -9,6 +9,7 @@ node_t *new_node(int left, int right)
     n->idx = INT_MIN;
     n->depth = -1;
     n->num_leaves = 0;
+    n->lca_count = 0;
     n->uniq_str_count = -1;
 
     n->left_label = left;
@@ -30,6 +31,7 @@ node_t *new_leaf(int left)
     n->idx = INT_MAX;
     n->depth = -1;
     n->num_leaves = -1;
+    n->lca_count = -1;
     n->uniq_str_count = -1;
 
     n->left_label = left;
@@ -109,7 +111,6 @@ void post_process_node(tree_t *tree, node_t *node)
     }
 
     node->depth = node->parent->depth + LABEL_LENGTH(node);
-    node->uniq_str_count = node->num_leaves;
 
     if (node->first_child == NULL)
     {
@@ -153,9 +154,14 @@ void process_leaves_pair(tree_t *tree)
         for (size_t j = 1; j + 1 < cur_idx; j++)
         {
             node_t *n = lca(li[j], li[j + 1]);
-            n->uniq_str_count--;
+            n->lca_count++;
         }
     }
+}
+
+void compute_uniq_str_count(tree_t *tree)
+{
+    // TODO
 }
 
 node_t *lca(node_t *n1, node_t *n2)

@@ -240,8 +240,8 @@ tree_t *build_tree(char *str, int num_strings)
 void main(void)
 {
     char *strings[] = {
-        "11111",
-        "11111",
+        "xxxxx",
+        "xxxxx",
         NULL
     };
 

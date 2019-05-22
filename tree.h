@@ -13,6 +13,7 @@ typedef struct node
     int idx; // TODO: just for debugging
     int depth;
     int num_leaves;
+    int lca_count;
     int uniq_str_count;
 
     struct node *parent;
@@ -53,6 +54,8 @@ int get_leaf_str_idx(tree_t *tree, node_t *node);
 void post_process_tree(tree_t *tree);
 
 void process_leaves_pair(tree_t *tree);
+
+void compute_uniq_str_count(tree_t *tree);
 
 bool is_end_sym(char c);
 
