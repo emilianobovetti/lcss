@@ -275,6 +275,7 @@ void fill_lcss(tree_t *tree, node_t *node, lcss_array_list_t **lcss)
     node_t *cur_lcs = lcss_node->current;
     lcss_array_list_t *lcss_tmp;
 
+    // TODO
     if (node->depth > cur_lcs->depth)
     {
         while (lcss_node != NULL)

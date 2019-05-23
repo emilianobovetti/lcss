@@ -1,15 +1,17 @@
 #!/bin/bash
 
 self_path="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-str_file="$self_path/ran_strings"
+test_path="$self_path/test"
+test_file="$test_path/strings"
 exe="$self_path/build/lcss"
 
-str=""
+mkdir -p "$test_path"
+rm -f "$test_file"
 
 for i in {0..126}; do
-    str="$str$(ranstr -l 20000 -r a-d)\n"
+    ranstr -l 200 -r a-d >> "$test_file"
 done
 
 make
 
-time (printf "$str" | "$exe")
+time (cat "$test_file" | "$exe")

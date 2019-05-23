@@ -13,7 +13,7 @@ make
 cat "$str_file" |
 "$exe" |
 while read rec; do
-    str="$(echo "$rec" | awk 'NF == 2 { print $2 }')"
+    str="$(echo "$rec" | awk '{ print $2 }')"
 
     if [ -n "$str" ]; then
         expected_count="$(echo "$rec" | awk '{ print $1 }')"
