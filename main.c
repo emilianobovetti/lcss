@@ -1,23 +1,41 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <stdbool.h>
 #include <string.h>
 #include <limits.h>
 
 #include "tree.h"
 #include "ukkonen.h"
 
-void main(void)
+typedef struct joined_str
 {
-    char *strings[] = {
-        "hello, world",
-        NULL
-    };
+    char *ptr;
 
-    int n_str;
+    size_t num_strings;
+}
+joined_str_t;
 
-    // 1 for \0
-    size_t total_len = 1;
+node_t **tree_to_lcss(tree_t* tree)
+{
+    post_process_tree(tree);
+    process_leaves_pair(tree);
+    compute_uniq_str_count(tree);
+
+    return get_lcss(tree);
+}
+
+void print_lcss(tree_t *tree, node_t **lcss)
+{
+    for (int i = 1; i <= tree->num_strings; i++)
+    {
+        char *i_lcs = to_string(tree, lcss[i]);
+        printf("%d -> %s\n", i, i_lcs);
+    }
+}
+
+joined_str_t *join_str_arr(char **strings)
+{
+    size_t total_len = 1; // +1 for '\0'
+    size_t n_str;
 
     for (n_str = 0; strings[n_str] != NULL; n_str++)
     {
@@ -36,7 +54,7 @@ void main(void)
             fprintf(stderr, "Too many strings\n");
             fprintf(stderr, "I can't handle more than %d strings :(\n", UCHAR_MAX - SCHAR_MAX);
             fprintf(stderr, "(char '%d' isn't a valid end symbol)\n", end_sym);
-            return;
+            return NULL;
         }
 
         char *cur_str = strings[n_str];
@@ -58,17 +76,30 @@ void main(void)
     // don't forget to bring a towel
     cat[cat_idx] = '\0';
 
-    tree_t *tree = build_tree(cat, n_str);
-    post_process_tree(tree);
-    process_leaves_pair(tree);
-    compute_uniq_str_count(tree);
+    joined_str_t *res = malloc(sizeof(joined_str_t));
+    res->ptr = cat;
+    res->num_strings = n_str;
 
-    node_t **lcss = get_lcss(tree);
+    return res;
+}
 
-    for (int i = 1; i <= tree->num_strings; i++)
-    {
-        char *i_lcs = to_string(tree, lcss[i]);
-        printf("%d -> %s\n", i, i_lcs);
-        free(i_lcs);
-    }
+void test_with_static_strings(void)
+{
+    char *test[] = {
+        "asd",
+        "asd",
+        "asd",
+        NULL
+    };
+
+    joined_str_t *join = join_str_arr(test);
+
+    tree_t *tree = build_tree(join->ptr, join->num_strings);
+    node_t **lcss = tree_to_lcss(tree);
+    print_lcss(tree, lcss);
+}
+
+void main(void)
+{
+    test_with_static_strings();
 }

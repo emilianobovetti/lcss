@@ -273,12 +273,9 @@ void fill_lcss(tree_t *tree, node_t *node, node_t **lcss)
 
     node_t *cur_lcs = lcss[node->uniq_str_count];
 
-    if (node->uniq_str_count > 0 && node->depth > cur_lcs->depth)
+    if (node->depth > cur_lcs->depth)
     {
-        //TODO
-        //if (node->uniq_str_count == 2) print_label(tree, node);
-
-        //printf("'%s', uniq_str_count = %d \n", to_string(tree, node), node->uniq_str_count);
+        // TODO: handle node->depth == cur_lcs->depth
         lcss[node->uniq_str_count] = node;
     }
 
