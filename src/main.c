@@ -28,7 +28,7 @@ void print_lcss(tree_t *tree, node_t **lcss)
     for (int i = 1; i <= tree->num_strings; i++)
     {
         char *i_lcs = to_string(tree, lcss[i]);
-        printf("%d -> %s\n", i, i_lcs);
+        printf("%d %s\n", i, i_lcs);
     }
 }
 
@@ -39,7 +39,7 @@ bool check_end_sym(char end_sym)
     if (!check)
     {
         fprintf(stderr, "Too many strings\n");
-        fprintf(stderr, "I can't handle more than %d strings :(\n", UCHAR_MAX - SCHAR_MAX);
+        fprintf(stderr, "I can't handle more than %d strings :(\n", UCHAR_MAX - SCHAR_MAX - 1);
         fprintf(stderr, "(char '%d' isn't a valid end symbol)\n", end_sym);
     }
 
@@ -57,7 +57,7 @@ joined_str_t *join_str_arr(char **strings)
         total_len += strlen(strings[n_str]) + 1;
     }
 
-    char *cat = calloc(total_len, sizeof(char));
+    char *cat = calloc(total_len, 1); // sizeof(char)
     size_t cat_idx = 0;
     char end_sym = UCHAR_MAX;
 
@@ -108,20 +108,18 @@ void test_with_static_strings(void)
     print_lcss(tree, lcss);
 }
 
-#define SIZE_CHUNK 1024
+#define BASE_SIZE 1024
 
 joined_str_t *read_strings(FILE* fp)
 {
-    size_t cur_size = SIZE_CHUNK;
+    size_t cur_size = BASE_SIZE;
+    size_t num_strings = 1;
     size_t len = 0;
     char end_sym = UCHAR_MAX;
     char cur_c;
 
-    char *str = calloc(cur_size, sizeof(char));
-
-    // TODO: free res when returing NULL
-    joined_str_t *res = malloc(sizeof(joined_str_t));
-    res->num_strings = 0;
+    char *str = malloc(cur_size); // sizeof(char)
+    char *tmp = NULL;
 
     if (str == NULL)
     {
@@ -140,7 +138,7 @@ joined_str_t *read_strings(FILE* fp)
         if (cur_c == '\n')
         {
             str[len++] = end_sym--;
-            res->num_strings++;
+            num_strings++;
 
             if (!check_end_sym(end_sym))
             {
@@ -153,12 +151,14 @@ joined_str_t *read_strings(FILE* fp)
             str[len++] = cur_c;
         }
 
-        if (len == SIZE_CHUNK)
+        if (len == cur_size)
         {
-            cur_size += SIZE_CHUNK;
-            printf("cur_size: %d\n", cur_size);
+            cur_size *= 2;
+            tmp = malloc(cur_size);
 
-            str = realloc(str, sizeof(char) * cur_size);
+            memcpy(tmp, str, len);
+            free(str);
+            str = tmp;
 
             if (str == NULL)
             {
@@ -169,7 +169,9 @@ joined_str_t *read_strings(FILE* fp)
 
     str[len++] = '\0';
 
-    res->ptr = realloc(str, sizeof(char) * len);
+    joined_str_t *res = malloc(sizeof(joined_str_t));
+    res->num_strings = num_strings;
+    res->ptr = realloc(str, len); // sizeof(char)
 
     return res;
 }

@@ -322,7 +322,7 @@ int label_cpy(node_t *node, char *str, char* out, int idx)
 
 char *to_string(tree_t *tree, node_t *node)
 {
-    char *out = calloc(node->depth, sizeof(char));
+    char *out = calloc(node->depth, 1); // sizeof(char)
     int idx = node->depth - 1;
 
     out[idx--] = '\0';
