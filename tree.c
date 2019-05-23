@@ -73,7 +73,7 @@ tree_t *new_tree(char *str, int num_strings)
 
 bool is_end_sym(char c)
 {
-    return c <= 31 || c >= SCHAR_MAX;
+    return c < 31 || c > SCHAR_MAX;
 }
 
 int get_leaf_str_idx(tree_t *tree, node_t *node)

@@ -240,9 +240,7 @@ tree_t *build_tree(char *str, int num_strings)
 void main(void)
 {
     char *strings[] = {
-        "111",
-        "22211",
-        "33333112",
+        "hello, world",
         NULL
     };
 
@@ -282,8 +280,9 @@ void main(void)
             j++;
         }
 
-        cat[cat_idx] = end_sym--;
+        cat[cat_idx] = end_sym;
         cat_idx++;
+        end_sym--;
     }
 
     // don't forget to bring a towel
