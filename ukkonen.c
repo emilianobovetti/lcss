@@ -240,7 +240,9 @@ tree_t *build_tree(char *str, int num_strings)
 void main(void)
 {
     char *strings[] = {
-        "hello, world",
+        "111",
+        "22211",
+        "33333112",
         NULL
     };
 
@@ -288,8 +290,12 @@ void main(void)
     cat[cat_idx] = '\0';
 
     tree_t *tree = build_tree(cat, n_str);
-    node_t *lcs = get_lcs(tree);
-    char *str_lcs = to_string(tree, lcs);
+    node_t **lcss = get_lcss(tree);
 
-    printf("lcs = %s\n", str_lcs);
+    for (int i = 1; i <= tree->num_strings; i++)
+    {
+        char *i_lcs = to_string(tree, lcss[i]);
+        printf("%d -> %s\n", i, i_lcs);
+        free(i_lcs);
+    }
 }

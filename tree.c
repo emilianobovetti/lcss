@@ -264,6 +264,42 @@ node_t *get_lcs(tree_t *tree)
     return node_lcs(tree->root);
 }
 
+void fill_lcss(tree_t *tree, node_t *node, node_t **lcss)
+{
+    if (node == NULL)
+    {
+        return;
+    }
+
+    node_t *cur_lcs = lcss[node->uniq_str_count];
+
+    if (node->uniq_str_count > 0 && node->depth > cur_lcs->depth)
+    {
+        //TODO
+        //if (node->uniq_str_count == 2) print_label(tree, node);
+
+        //printf("'%s', uniq_str_count = %d \n", to_string(tree, node), node->uniq_str_count);
+        lcss[node->uniq_str_count] = node;
+    }
+
+    fill_lcss(tree, node->next_sibling, lcss);
+    fill_lcss(tree, node->first_child, lcss);
+}
+
+node_t **get_lcss(tree_t *tree)
+{
+    node_t **lcss = calloc(tree->num_strings + 1, sizeof(node_t *));
+
+    for (int i = 0; i <= tree->num_strings; i++)
+    {
+        lcss[i] = tree->root;
+    }
+
+    fill_lcss(tree, tree->root, lcss);
+
+    return lcss;
+}
+
 int label_cpy(node_t *node, char *str, char* out, int idx)
 {
     int left_label = node->left_label;
@@ -294,7 +330,7 @@ char *to_string(tree_t *tree, node_t *node)
 
     out[idx--] = '\0';
 
-    if (idx == 0)
+    if (idx < 0)
     {
         return out;
     }
