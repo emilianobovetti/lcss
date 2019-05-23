@@ -264,32 +264,55 @@ node_t *get_lcs(tree_t *tree)
     return node_lcs(tree->root);
 }
 
-void fill_lcss(tree_t *tree, node_t *node, node_t **lcss)
+void fill_lcss(tree_t *tree, node_t *node, lcss_array_list_t **lcss)
 {
     if (node == NULL)
     {
         return;
     }
 
-    node_t *cur_lcs = lcss[node->uniq_str_count];
+    lcss_array_list_t *lcss_node = lcss[node->uniq_str_count];
+    node_t *cur_lcs = lcss_node->current;
+    lcss_array_list_t *lcss_tmp;
 
     if (node->depth > cur_lcs->depth)
     {
-        // TODO: handle node->depth == cur_lcs->depth
-        lcss[node->uniq_str_count] = node;
+        while (lcss_node != NULL)
+        {
+            lcss_tmp = lcss_node->next;
+            free(lcss_node);
+            lcss_node = lcss_tmp;
+        }
+
+        lcss_tmp = malloc(sizeof(lcss_array_list_t));
+        lcss_tmp->current = node;
+        lcss_tmp->next = NULL;
+
+        lcss[node->uniq_str_count] = lcss_tmp;
+    }
+
+    if (node->depth == cur_lcs->depth)
+    {
+        lcss_tmp = malloc(sizeof(lcss_array_list_t));
+        lcss_tmp->current = node;
+        lcss_tmp->next = lcss_node;
+
+        lcss[node->uniq_str_count] = lcss_tmp;
     }
 
     fill_lcss(tree, node->next_sibling, lcss);
     fill_lcss(tree, node->first_child, lcss);
 }
 
-node_t **get_lcss(tree_t *tree)
+lcss_array_list_t **get_lcss(tree_t *tree)
 {
-    node_t **lcss = calloc(tree->num_strings + 1, sizeof(node_t *));
+    lcss_array_list_t **lcss = calloc(tree->num_strings + 1, sizeof(lcss_array_list_t *));
 
     for (int i = 0; i <= tree->num_strings; i++)
     {
-        lcss[i] = tree->root;
+        lcss[i] = malloc(sizeof(lcss_array_list_t));
+        lcss[i]->current = tree->root;
+        lcss[i]->next = NULL;
     }
 
     fill_lcss(tree, tree->root, lcss);

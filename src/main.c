@@ -14,7 +14,7 @@ typedef struct joined_str
 }
 joined_str_t;
 
-node_t **tree_to_lcss(tree_t* tree)
+lcss_array_list_t **tree_to_lcss(tree_t* tree)
 {
     post_process_tree(tree);
     process_leaves_pair(tree);
@@ -23,12 +23,24 @@ node_t **tree_to_lcss(tree_t* tree)
     return get_lcss(tree);
 }
 
-void print_lcss(tree_t *tree, node_t **lcss)
+void print_lcss(tree_t *tree, lcss_array_list_t **lcss)
 {
     for (int i = 1; i <= tree->num_strings; i++)
     {
-        char *i_lcs = to_string(tree, lcss[i]);
-        printf("%d %s\n", i, i_lcs);
+        printf("%d", i);
+
+        lcss_array_list_t *lcss_node = lcss[i];
+
+        while (lcss_node != NULL)
+        {
+            char *i_lcs = to_string(tree, lcss_node->current);
+            printf(" %s", i_lcs);
+            free(i_lcs);
+
+            lcss_node = lcss_node->next;
+        }
+
+        putchar('\n');
     }
 }
 
@@ -104,7 +116,7 @@ void test_with_static_strings(void)
     joined_str_t *join = join_str_arr(test);
 
     tree_t *tree = build_tree(join->ptr, join->num_strings);
-    node_t **lcss = tree_to_lcss(tree);
+    lcss_array_list_t **lcss = tree_to_lcss(tree);
     print_lcss(tree, lcss);
 }
 
@@ -187,6 +199,6 @@ int main(void)
     }
 
     tree_t *tree = build_tree(join->ptr, join->num_strings);
-    node_t **lcss = tree_to_lcss(tree);
+    lcss_array_list_t **lcss = tree_to_lcss(tree);
     print_lcss(tree, lcss);
 }

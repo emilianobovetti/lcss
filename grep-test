@@ -1,0 +1,30 @@
+#!/bin/bash
+
+self_path="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+str_file="$self_path/ran_strings"
+exe="$self_path/build/lcss"
+
+for i in {0..126}; do
+    ranstr -l 20000 -r a-d >> "$str_file"
+done
+
+make
+
+cat "$str_file" |
+"$exe" |
+while read rec; do
+    str="$(echo "$rec" | awk 'NF == 2 { print $2 }')"
+
+    if [ -n "$str" ]; then
+        expected_count="$(echo "$rec" | awk '{ print $1 }')"
+
+        if [ $(grep -c "$str" "$str_file") -eq $expected_count ]; then
+            echo "'$str' found $expected_count times"
+        else
+            echo "Found mismatch with '$str'"
+            exit 1
+        fi
+    fi
+done
+
+rm -f "$str_file"

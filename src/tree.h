@@ -41,6 +41,14 @@ typedef struct tree
 }
 tree_t;
 
+typedef struct lcss_array_list
+{
+    struct node *current;
+
+    struct lcss_array_list *next;
+}
+lcss_array_list_t;
+
 node_t *new_node(int left, int right);
 
 node_t *new_leaf(int left);
@@ -61,7 +69,7 @@ node_t *lca(node_t *n1, node_t *n2);
 
 node_t *get_lcs(tree_t *tree);
 
-node_t **get_lcss(tree_t *tree);
+lcss_array_list_t **get_lcss(tree_t *tree);
 
 char *to_string(tree_t *tree, node_t *n);
 
