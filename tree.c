@@ -1,4 +1,5 @@
 #include "tree.h"
+#include "debug.h"
 
 #define LABEL_LENGTH(n) ((n)->right_label - (n)->left_label + 1)
 
@@ -7,10 +8,10 @@ node_t *new_node(int left, int right)
     node_t *n = malloc(sizeof(node_t));
 
     n->idx = INT_MIN;
-    n->depth = -1;
+    n->depth = 0;
     n->num_leaves = 0;
     n->lca_count = 0;
-    n->uniq_str_count = -1;
+    n->uniq_str_count = 0;
 
     n->left_label = left;
     n->right_label = right;
@@ -29,10 +30,10 @@ node_t *new_leaf(int left)
     node_t *n = malloc(sizeof(node_t));
 
     n->idx = INT_MAX;
-    n->depth = -1;
-    n->num_leaves = -1;
-    n->lca_count = -1;
-    n->uniq_str_count = -1;
+    n->depth = 0;
+    n->num_leaves = 0;
+    n->lca_count = 0;
+    n->uniq_str_count = 0;
 
     n->left_label = left;
     // open transition
@@ -70,18 +71,6 @@ tree_t *new_tree(char *str, int num_strings)
     return tree;
 }
 
-void update_num_leaves(node_t *node)
-{
-    if (node == NULL)
-    {
-        return;
-    }
-
-    node->num_leaves++;
-
-    update_num_leaves(node->parent);
-}
-
 bool is_end_sym(char c)
 {
     return c <= 31 || c >= SCHAR_MAX;
@@ -90,6 +79,27 @@ bool is_end_sym(char c)
 int get_leaf_str_idx(tree_t *tree, node_t *node)
 {
     return - tree->str[node->right_label] - 1;
+}
+
+int process_num_leaves(node_t *node)
+{
+    node_t *first_child = node->first_child;
+
+    if (first_child == NULL)
+    {
+        return 1;
+    }
+
+    node->num_leaves = process_num_leaves(first_child);
+    node_t *next_child = first_child->next_sibling;
+
+    while (next_child != NULL)
+    {
+        node->num_leaves += process_num_leaves(next_child);
+        next_child = next_child->next_sibling;
+    }
+
+    return node->num_leaves;
 }
 
 void post_process_node(tree_t *tree, node_t *node)
@@ -133,6 +143,8 @@ void post_process_node(tree_t *tree, node_t *node)
 
 void post_process_tree(tree_t *tree)
 {
+    process_num_leaves(tree->root);
+
     tree->leaves_matrix = calloc(tree->num_strings, sizeof(node_t**));
 
     for (size_t i = 0; i < tree->num_strings; i++)
@@ -153,17 +165,46 @@ void process_leaves_pair(tree_t *tree)
 
         for (size_t j = 1; j + 1 < cur_idx; j++)
         {
-            node_t *n = lca(li[j], li[j + 1]);
+            node_t *n = lca(li[j]->parent, li[j + 1]->parent);
             n->lca_count++;
         }
     }
 }
 
-void compute_uniq_str_count(tree_t *tree)
+int process_corr_fac(node_t *node)
 {
-    // TODO
+    node_t *first_child = node->first_child;
+
+    if (first_child == NULL)
+    {
+        return 0;
+    }
+
+    int corr_fac = process_corr_fac(first_child);
+    node_t *next_child = first_child->next_sibling;
+
+    while (next_child != NULL)
+    {
+        corr_fac += process_corr_fac(next_child);
+        next_child = next_child->next_sibling;
+    }
+
+    corr_fac += node->lca_count;
+    node->uniq_str_count = node->num_leaves - corr_fac;
+
+    return corr_fac;
 }
 
+void compute_uniq_str_count(tree_t *tree)
+{
+    // C(v)           = S(v)       - U(v)
+    // uniq_str_count = num_leaves - corr_fac
+    process_corr_fac(tree->root);
+}
+
+/*
+ * TODO: efficient implementation
+ */
 node_t *lca(node_t *n1, node_t *n2)
 {
     if (n1 == n2)

@@ -178,7 +178,6 @@ void update(tree_t *tree, node_t *node, int k, int i, node_left_ptr_t *res)
 
         node_t *rp = new_leaf(i);
         rp->parent = r;
-        update_num_leaves(r);
 
         if (r->last_child == NULL)
         {
@@ -233,6 +232,7 @@ tree_t *build_tree(char *str, int num_strings)
 
     post_process_tree(tree);
     process_leaves_pair(tree);
+    compute_uniq_str_count(tree);
 
     return tree;
 }

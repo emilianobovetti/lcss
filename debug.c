@@ -43,7 +43,7 @@ void print_label(tree_t *tree, node_t *node)
 
     if (node->first_child != NULL)
     {
-        printf("S=%d C=%d ", node->num_leaves, node->uniq_str_count);
+        printf("C=%d ", node->uniq_str_count);
     }
 
     printf("%d ", node->idx);
@@ -100,7 +100,7 @@ void print_leaves_matrix(tree_t *tree)
 
 void print_tree(tree_t *tree)
 {
-    print_leaves_matrix(tree);
+    //print_leaves_matrix(tree);
 
     print_node(tree, tree->root);
     printf("\n");

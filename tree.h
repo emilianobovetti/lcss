@@ -47,8 +47,6 @@ node_t *new_leaf(int left);
 
 tree_t *new_tree(char *str, int num_strings);
 
-void update_num_leaves(node_t *node);
-
 int get_leaf_str_idx(tree_t *tree, node_t *node);
 
 void post_process_tree(tree_t *tree);
