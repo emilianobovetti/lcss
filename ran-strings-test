@@ -9,7 +9,7 @@ mkdir -p "$test_path"
 rm -f "$test_file"
 
 for i in {0..126}; do
-    ranstr -l 200 -r a-d >> "$test_file"
+    ./ranstr -l 200 -r a-d >> "$test_file"
 done
 
 make
