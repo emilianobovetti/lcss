@@ -294,6 +294,11 @@ char *to_string(tree_t *tree, node_t *node)
 
     out[idx--] = '\0';
 
+    if (idx == 0)
+    {
+        return out;
+    }
+
     node_t *cur = node;
 
     while (cur != tree->aux)
@@ -302,8 +307,6 @@ char *to_string(tree_t *tree, node_t *node)
 
         cur = cur->parent;
     }
-
-    printf("idx = %d\n", idx);
 
     return out;
 }
