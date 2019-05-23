@@ -5,7 +5,7 @@ str_file="$self_path/ran_strings"
 exe="$self_path/build/lcss"
 
 for i in {0..126}; do
-    ranstr -l 1000 -r a-d >> "$str_file"
+    ranstr -l 20000 -r a-d >> "$str_file"
 done
 
 make
