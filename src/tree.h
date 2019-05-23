@@ -35,6 +35,7 @@ typedef struct tree
     int cur_node_idx; // TODO: just for debugging
 
     struct node ***leaves_matrix;
+    int *str_count_to_max_depth;
 
     struct node *aux;
     struct node *root;

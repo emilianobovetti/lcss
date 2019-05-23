@@ -2,6 +2,7 @@
 #include "debug.h"
 
 #define LABEL_LENGTH(n) ((n)->right_label - (n)->left_label + 1)
+#define MAX(a, b) (((a) > (b)) ? (a) : (b))
 
 node_t *new_node(int left, int right)
 {
@@ -104,26 +105,21 @@ int process_num_leaves(node_t *node)
 
 void post_process_node(tree_t *tree, node_t *node)
 {
-    if (node == NULL)
-    {
-        return;
-    }
-
-    char *str = tree->str;
-
-    for (int i = node->left_label; i <= node->right_label; i++)
-    {
-        if (is_end_sym(str[i]))
-        {
-            node->right_label = i;
-            break;
-        }
-    }
-
     node->depth = node->parent->depth + LABEL_LENGTH(node);
 
     if (node->first_child == NULL)
     {
+        char *str = tree->str;
+
+        for (int i = node->left_label; i <= node->right_label; i++)
+        {
+            if (is_end_sym(str[i]))
+            {
+                node->right_label = i;
+                break;
+            }
+        }
+
         node->idx = tree->cur_leaf_idx++;
 
         node_t** li = tree->leaves_matrix[get_leaf_str_idx(tree, node)];
@@ -138,7 +134,10 @@ void post_process_node(tree_t *tree, node_t *node)
         post_process_node(tree, node->first_child);
     }
 
-    post_process_node(tree, node->next_sibling);
+    if (node->next_sibling != NULL)
+    {
+        post_process_node(tree, node->next_sibling);
+    }
 }
 
 void post_process_tree(tree_t *tree)
@@ -195,11 +194,36 @@ int process_corr_fac(node_t *node)
     return corr_fac;
 }
 
+void fill_str_count_to_max_depth(tree_t *tree, node_t *node)
+{
+    if (node == NULL)
+    {
+        return;
+    }
+
+    int sc = node->uniq_str_count;
+    int cur = tree->str_count_to_max_depth[sc];
+
+    tree->str_count_to_max_depth[sc] = MAX(cur, node->depth);
+
+    fill_str_count_to_max_depth(tree, node->next_sibling);
+    fill_str_count_to_max_depth(tree, node->first_child);
+}
+
 void compute_uniq_str_count(tree_t *tree)
 {
     // C(v)           = S(v)       - U(v)
     // uniq_str_count = num_leaves - corr_fac
     process_corr_fac(tree->root);
+
+    tree->str_count_to_max_depth = calloc(tree->num_strings + 1, sizeof(int));
+
+    for (int i = 0; i <= tree->num_strings; i++)
+    {
+        tree->str_count_to_max_depth[i] = 0;
+    }
+
+    fill_str_count_to_max_depth(tree, tree->root);
 }
 
 /*
@@ -271,34 +295,16 @@ void fill_lcss(tree_t *tree, node_t *node, lcss_array_list_t **lcss)
         return;
     }
 
-    lcss_array_list_t *lcss_node = lcss[node->uniq_str_count];
-    node_t *cur_lcs = lcss_node->current;
-    lcss_array_list_t *lcss_tmp;
+    int max_depth = tree->str_count_to_max_depth[node->uniq_str_count];
 
-    // TODO
-    if (node->depth > cur_lcs->depth)
+    if (node->depth == max_depth)
     {
-        while (lcss_node != NULL)
-        {
-            lcss_tmp = lcss_node->next;
-            free(lcss_node);
-            lcss_node = lcss_tmp;
-        }
+        lcss_array_list_t *new_lcs = malloc(sizeof(lcss_array_list_t));
 
-        lcss_tmp = malloc(sizeof(lcss_array_list_t));
-        lcss_tmp->current = node;
-        lcss_tmp->next = NULL;
+        new_lcs->current = node;
+        new_lcs->next = lcss[node->uniq_str_count];
 
-        lcss[node->uniq_str_count] = lcss_tmp;
-    }
-
-    if (node->depth == cur_lcs->depth)
-    {
-        lcss_tmp = malloc(sizeof(lcss_array_list_t));
-        lcss_tmp->current = node;
-        lcss_tmp->next = lcss_node;
-
-        lcss[node->uniq_str_count] = lcss_tmp;
+        lcss[node->uniq_str_count] = new_lcs;
     }
 
     fill_lcss(tree, node->next_sibling, lcss);
