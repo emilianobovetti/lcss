@@ -1,12 +1,12 @@
 #!/bin/bash
 
 self_path="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
-cd "$self_path"
+src_path="$self_path/src"
+build_path="$self_path/build"
 
 mkdir -p build
 
-gcc -O3 *.c -o build/lcs
+(cd "$src_path" && gcc -O3 *.c -o "$build_path/lcs")
 
 str=""
 
@@ -14,4 +14,4 @@ for i in {0..10}; do
     str="$str$(ranstr -l 1000 -r a-d)\n"
 done
 
-time (printf "$str" | ./build/lcs)
+time (printf "$str" | "$build_path/lcs")

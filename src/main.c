@@ -156,6 +156,8 @@ joined_str_t *read_strings(FILE* fp)
         if (len == SIZE_CHUNK)
         {
             cur_size += SIZE_CHUNK;
+            printf("cur_size: %d\n", cur_size);
+
             str = realloc(str, sizeof(char) * cur_size);
 
             if (str == NULL)
@@ -172,9 +174,15 @@ joined_str_t *read_strings(FILE* fp)
     return res;
 }
 
-void main(void)
+int main(void)
 {
     joined_str_t *join = read_strings(stdin);
+
+    if (join == NULL)
+    {
+        fprintf(stderr, "Error in read_strings\n");
+        return 1;
+    }
 
     tree_t *tree = build_tree(join->ptr, join->num_strings);
     node_t **lcss = tree_to_lcss(tree);
