@@ -1,0 +1,1 @@
+./seq-distance ./test/norm tgatgcgtgatat gtaaacgccttca -> 276 x 47

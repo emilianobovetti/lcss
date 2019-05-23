@@ -1,17 +1,22 @@
 #!/bin/bash
 
-seq1="$1"
-seq2="$2"
-str_file="$3"
+str_file="$1"
+
+seq1="$2"
+seq2="$3"
 
 len1="$(./strlength "$seq1")"
 len2="$(./strlength "$seq2")"
+
+matches=
+matches="$matches$(grep -o "$seq1.*$seq2" "$str_file")"
+matches="$matches$(grep -o "$seq2.*$seq1" "$str_file")"
 
 while read line; do
     count="$(echo "$line" | wc -m)"
     dist="$((count - len1 - len2))"
 
     distances="$(printf "%s\n%s" "$dist" "$distances")"
-done <<< $(grep -o "$seq1.*$seq2" "$str_file")
+done <<< "$matches"
 
 echo "$distances" | sort -n
