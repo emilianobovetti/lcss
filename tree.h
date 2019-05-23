@@ -59,4 +59,8 @@ bool is_end_sym(char c);
 
 node_t *lca(node_t *n1, node_t *n2);
 
+node_t *get_lcs(tree_t *tree);
+
+char *to_string(tree_t *tree, node_t *n);
+
 #endif

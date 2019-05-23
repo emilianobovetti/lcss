@@ -221,3 +221,89 @@ node_t *lca(node_t *n1, node_t *n2)
         return lca(n1, n2->parent);
     }
 }
+
+node_t *get_max(node_t *n1, node_t *n2)
+{
+    if (n1->uniq_str_count > n2->uniq_str_count)
+    {
+        return n1;
+    }
+
+    if (n2->uniq_str_count > n1->uniq_str_count)
+    {
+        return n2;
+    }
+
+    if (n1->depth > n2->depth)
+    {
+        return n1;
+    }
+
+    return n2;
+}
+
+node_t *node_lcs(node_t *node)
+{
+    node_t *max = node;
+
+    if (node->next_sibling != NULL)
+    {
+        max = get_max(node, node_lcs(node->next_sibling));
+    }
+
+    if (node->first_child != NULL)
+    {
+        max = get_max(node, node_lcs(node->first_child));
+    }
+
+    return max;
+}
+
+node_t *get_lcs(tree_t *tree)
+{
+    return node_lcs(tree->root);
+}
+
+int label_cpy(node_t *node, char *str, char* out, int idx)
+{
+    int left_label = node->left_label;
+    int right_label = node->right_label;
+
+    if (is_end_sym(str[right_label]))
+    {
+        if (right_label - left_label == 0)
+        {
+            return idx;
+        }
+
+        right_label--;
+    }
+
+    for (int i = right_label; i >= left_label; i--)
+    {
+        out[idx--] = str[i];
+    }
+
+    return idx;
+}
+
+char *to_string(tree_t *tree, node_t *node)
+{
+    char *out = calloc(node->depth, sizeof(char));
+    int idx = node->depth - 1;
+
+    out[idx--] = '\0';
+
+    node_t *cur = node;
+
+    while (cur != tree->aux)
+    {
+        idx = label_cpy(cur, tree->str, out, idx);
+
+        cur = cur->parent;
+    }
+
+    printf("idx = %d\n", idx);
+
+    return out;
+}
