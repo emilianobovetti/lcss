@@ -1,0 +1,8 @@
+#!/bin/bash
+
+out="$1/norm"
+
+for file in "$1"/*; do
+    sed '1d' "$file" | tr -d [:space:] >> "$out"
+    printf "\n" >> "$out"
+done

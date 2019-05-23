@@ -1,0 +1,13 @@
+#!/bin/bash
+
+seq1="$1"
+seq2="$2"
+str_file="$3"
+
+while read line; do
+    count="$(echo "$line" | wc -m)"
+
+    distances="$(printf "%s\n%s" "$count" "$distances")"
+done <<< $(grep -o "$seq1.*$seq2" "$str_file")
+
+echo "$distances" | sort -n
