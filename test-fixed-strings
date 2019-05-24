@@ -1,11 +1,11 @@
 #!/bin/bash
 
 self_path="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-exe="$self_path/build/lcss"
+lcss="$self_path/build/lcss"
 
 make
 
-"$exe" <<EOF
+"$lcss" <<EOF
 asdasd
 asdasd
 asddasd

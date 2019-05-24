@@ -128,7 +128,7 @@ joined_str_t *read_strings(FILE* fp)
     size_t num_strings = 1;
     size_t len = 0;
     char end_sym = UCHAR_MAX;
-    char cur_c;
+    char cur_c = '\0', last_c = '\0';
 
     char *str = malloc(cur_size); // sizeof(char)
     char *tmp = NULL;
@@ -140,11 +140,17 @@ joined_str_t *read_strings(FILE* fp)
 
     while (true)
     {
+        last_c = cur_c;
         cur_c = fgetc(fp);
 
         if (cur_c == EOF)
         {
             break;
+        }
+
+        if (last_c == '\n' && cur_c == '\n')
+        {
+            continue;
         }
 
         if (cur_c == '\n')
