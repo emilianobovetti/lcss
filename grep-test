@@ -17,11 +17,10 @@ make
 cat "$test_file" |
 "$exe" |
 while read rec; do
+    expected_count="$(echo "$rec" | awk '{ print $1 }')"
     str="$(echo "$rec" | awk '{ print $2 }')"
 
     if [ -n "$str" ]; then
-        expected_count="$(echo "$rec" | awk '{ print $1 }')"
-
         if [ $(grep -c "$str" "$test_file") -eq $expected_count ]; then
             echo "'$str' found $expected_count times"
         else

@@ -24,12 +24,14 @@ typedef struct node__prev_sibling
 }
 node__prev_sibling_t;
 
-void find_transition_and_prev(tree_t *tree, node_t *node, char t, node__prev_sibling_t *res)
+void find_transition_and_prev(tree_t *tree, char t, node__prev_sibling_t *data)
 {
+    node_t *node = data->node;
+    data->prev_sibling = NULL;
+
     if (node == tree->aux)
     {
-        res->prev_sibling = NULL;
-        res->node = tree->root;
+        data->node = tree->root;
 
         return;
     }
@@ -41,8 +43,8 @@ void find_transition_and_prev(tree_t *tree, node_t *node, char t, node__prev_sib
     {
         if (tree->str[child->left_label] == t)
         {
-            res->prev_sibling = prev;
-            res->node = child;
+            data->prev_sibling = prev;
+            data->node = child;
 
             return;
         }
@@ -50,12 +52,14 @@ void find_transition_and_prev(tree_t *tree, node_t *node, char t, node__prev_sib
         prev = child;
         child = child->next_sibling;
     }
+
+    data->node = NULL;
 }
 
 node_t *find_transition(tree_t *tree, node_t *node, char t)
 {
-    node__prev_sibling_t t_search = { .node = NULL, .prev_sibling = NULL };
-    find_transition_and_prev(tree, node, t, &t_search);
+    node__prev_sibling_t t_search = { .node = node, .prev_sibling = NULL };
+    find_transition_and_prev(tree, t, &t_search);
 
     return t_search.node;
 }
@@ -69,8 +73,8 @@ void test_and_split(tree_t *tree, int k, int p, char t, node__is_endpoint_t *dat
 
     if (k <= p)
     {
-        node__prev_sibling_t t_search = { .node = NULL, .prev_sibling = NULL };
-        find_transition_and_prev(tree, s, str[k], &t_search);
+        node__prev_sibling_t t_search = { .node = s, .prev_sibling = NULL };
+        find_transition_and_prev(tree, str[k], &t_search);
         node_t *sp = t_search.node;
         int kp = sp->left_label;
 
