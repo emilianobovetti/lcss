@@ -46,7 +46,7 @@ void print_label(tree_t *tree, node_t *node)
         printf("C=%d ", node->uniq_str_count);
     }
 
-    printf("%d ", node->idx);
+    printf("%d ", node);
 
     if (node->right_label >= INT_MAX)
     {
@@ -78,20 +78,18 @@ void print_node(tree_t *tree, node_t *node)
     print_node(tree, node->first_child);
 }
 
-void print_leaves_matrix(tree_t *tree)
+void print_all_leaf_lists(tree_t *tree)
 {
-    printf("leaves matrix\n");
-
     for (size_t i = 0; i < tree->num_strings; i++)
     {
-        node_t** li = tree->leaves_matrix[i];
-        size_t cur_idx = (size_t) li[0];
+        node_t** leafs = tree->str_idx_to_leaf_list[i];
+        size_t cur_idx = (size_t) leafs[0];
 
         printf("str %d:", i);
 
         for (size_t j = 1; j < cur_idx; j++)
         {
-            printf(" %2d", li[j]->idx);
+            printf(" %d", leafs[j]);
         }
 
         printf("\n");

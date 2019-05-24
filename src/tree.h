@@ -10,7 +10,6 @@ typedef struct node
 {
     int left_label, right_label;
 
-    int idx; // TODO: just for debugging
     int depth;
     int num_leaves;
     int lca_count;
@@ -31,10 +30,18 @@ typedef struct tree
     int last_idx;
     int num_strings;
 
-    int cur_leaf_idx;
-    int cur_node_idx; // TODO: just for debugging
+    /*
+     * Each end symbol is in correspondence with a string index.
+     * This data structure holds a list of every leafs that
+     * contain the end symbol of a given string.
+     */
+    struct node ***str_idx_to_leaf_list;
 
-    struct node ***leaves_matrix;
+    /*
+     * Stores, for every uniq_str_count = 1 .. num_strings,
+     * the max depth at wich a node with that uniq_str_count
+     * is found.
+     */
     int *str_count_to_max_depth;
 
     struct node *aux;
@@ -72,6 +79,6 @@ node_t *get_lcs(tree_t *tree);
 
 lcss_array_list_t **get_lcss(tree_t *tree);
 
-char *to_string(tree_t *tree, node_t *n);
+char *node_to_string(tree_t *tree, node_t *n);
 
 #endif

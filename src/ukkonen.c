@@ -214,9 +214,9 @@ tree_t *build_tree(char *str, int num_strings)
 {
     tree_t *tree = new_tree(str, num_strings);
 
-    node__left_ptr_t s_k = { .node = tree->root, .left_ptr = 0 };
-
     int phase = 0;
+
+    node__left_ptr_t s_k = { .node = tree->root, .left_ptr = 0 };
 
     while (str[phase] != '\0')
     {

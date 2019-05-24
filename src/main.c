@@ -33,7 +33,7 @@ void print_lcss(tree_t *tree, lcss_array_list_t **lcss)
 
         while (lcss_node != NULL)
         {
-            char *i_lcs = to_string(tree, lcss_node->current);
+            char *i_lcs = node_to_string(tree, lcss_node->current);
             printf(" %s", i_lcs);
             free(i_lcs);
 

@@ -1,5 +1,4 @@
 #include "tree.h"
-#include "debug.h"
 
 #define LABEL_LENGTH(n) ((n)->right_label - (n)->left_label + 1)
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
@@ -8,7 +7,6 @@ node_t *new_node(int left, int right)
 {
     node_t *n = malloc(sizeof(node_t));
 
-    n->idx = INT_MIN;
     n->depth = 0;
     n->num_leaves = 0;
     n->lca_count = 0;
@@ -30,7 +28,6 @@ node_t *new_leaf(int left)
 {
     node_t *n = malloc(sizeof(node_t));
 
-    n->idx = INT_MAX;
     n->depth = 0;
     n->num_leaves = 0;
     n->lca_count = 0;
@@ -57,9 +54,6 @@ tree_t *new_tree(char *str, int num_strings)
     tree->str = str;
     tree->last_idx = 0;
     tree->num_strings = num_strings;
-
-    tree->cur_leaf_idx = 0;
-    tree->cur_node_idx = -1;
 
     tree->aux = aux;
     tree->root = root;
@@ -103,6 +97,23 @@ int process_num_leaves(node_t *node)
     return node->num_leaves;
 }
 
+void free_children(node_t *node)
+{
+    node_t *cur = node->first_child;
+    node_t *tmp;
+
+    while (cur != NULL)
+    {
+        tmp = cur->next_sibling;
+        free_children(cur);
+        free(cur);
+
+        cur = tmp;
+    }
+
+    node->first_child = NULL;
+}
+
 void post_process_node(tree_t *tree, node_t *node)
 {
     node->depth = node->parent->depth + LABEL_LENGTH(node);
@@ -128,17 +139,14 @@ void post_process_node(tree_t *tree, node_t *node)
             }
         }
 
-        node->idx = tree->cur_leaf_idx++;
+        node_t** leafs = tree->str_idx_to_leaf_list[get_leaf_str_idx(tree, node)];
+        size_t cur_idx = (size_t) leafs[0];
 
-        node_t** li = tree->leaves_matrix[get_leaf_str_idx(tree, node)];
-        size_t cur_idx = (size_t) li[0];
-
-        li[cur_idx++] = node;
-        li[0] = (node_t*) cur_idx;
+        leafs[cur_idx++] = node;
+        leafs[0] = (node_t*) cur_idx;
     }
     else
     {
-        node->idx = tree->cur_node_idx--;
         post_process_node(tree, node->first_child);
     }
 
@@ -152,12 +160,12 @@ void post_process_tree(tree_t *tree)
 {
     process_num_leaves(tree->root);
 
-    tree->leaves_matrix = calloc(tree->num_strings, sizeof(node_t**));
+    tree->str_idx_to_leaf_list = calloc(tree->num_strings, sizeof(node_t**));
 
     for (size_t i = 0; i < tree->num_strings; i++)
     {
-        tree->leaves_matrix[i] = calloc(tree->root->num_leaves + 1, sizeof(node_t*));
-        tree->leaves_matrix[i][0] = (node_t*) 1; // current index
+        tree->str_idx_to_leaf_list[i] = calloc(tree->root->num_leaves + 1, sizeof(node_t*));
+        tree->str_idx_to_leaf_list[i][0] = (node_t*) 1; // current index
     }
 
     post_process_node(tree, tree->root);
@@ -167,12 +175,12 @@ void process_leaves_pair(tree_t *tree)
 {
     for (size_t i = 0; i < tree->num_strings; i++)
     {
-        node_t** li = tree->leaves_matrix[i];
-        size_t cur_idx = (size_t) li[0];
+        node_t** leafs = tree->str_idx_to_leaf_list[i];
+        size_t cur_idx = (size_t) leafs[0];
 
         for (size_t j = 1; j + 1 < cur_idx; j++)
         {
-            node_t *n = lca(li[j]->parent, li[j + 1]->parent);
+            node_t *n = lca(leafs[j]->parent, leafs[j + 1]->parent);
             n->lca_count++;
         }
     }
@@ -358,7 +366,7 @@ int label_cpy(node_t *node, char *str, char* out, int idx)
     return idx;
 }
 
-char *to_string(tree_t *tree, node_t *node)
+char *node_to_string(tree_t *tree, node_t *node)
 {
     char *out = calloc(node->depth, 1); // sizeof(char)
     int idx = node->depth - 1;
