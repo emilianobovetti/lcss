@@ -1,8 +1,11 @@
 #!/bin/bash
 
-out="$1/norm"
+if [ -z "$1" ] || [ -z "$2" ]; then
+    echo "$(basename $0) /path/to/fasta/files out-file"
+    exit 1
+fi
 
 for file in "$1"/*; do
-    sed '1d' "$file" | tr -d [:space:] >> "$out"
-    printf "\n" >> "$out"
+    sed '1d' "$file" | tr -d [:space:] >> "$2"
+    printf "\n" >> "$2"
 done
