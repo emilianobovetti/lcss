@@ -111,7 +111,15 @@ void post_process_node(tree_t *tree, node_t *node)
     {
         char *str = tree->str;
 
-        for (int i = node->left_label; i <= node->right_label; i++)
+        /*
+         * Leafs with more than one end symbol need to be trimmed:
+         *  xyz$vwp# -> xyz$
+         *
+         * The condition `i <= node->right_label` isn't necessary
+         * since the right_label on leafs is set to an arbitrary
+         * high number by default.
+         */
+        for (int i = node->left_label; true; i++)
         {
             if (is_end_sym(str[i]))
             {

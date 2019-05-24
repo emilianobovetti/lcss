@@ -6,13 +6,13 @@
 #include "tree.h"
 #include "ukkonen.h"
 
-typedef struct joined_str
+typedef struct joined_strs
 {
     char *ptr;
 
     size_t num_strings;
 }
-joined_str_t;
+joined_strs_t;
 
 lcss_array_list_t **build_lcss(tree_t* tree)
 {
@@ -57,7 +57,7 @@ bool check_end_sym(char end_sym)
     return check;
 }
 
-joined_str_t *join_str_arr(char **strings)
+joined_strs_t *join_str_arr(char **strings)
 {
     size_t total_len = 1; // +1 for '\0'
     size_t n_str;
@@ -96,7 +96,7 @@ joined_str_t *join_str_arr(char **strings)
     // don't forget to bring a towel
     cat[cat_idx] = '\0';
 
-    joined_str_t *res = malloc(sizeof(joined_str_t));
+    joined_strs_t *res = malloc(sizeof(joined_strs_t));
     res->ptr = cat;
     res->num_strings = n_str;
 
@@ -106,13 +106,13 @@ joined_str_t *join_str_arr(char **strings)
 void test_with_static_strings(void)
 {
     char *test[] = {
-        "asd",
-        "asd",
-        "asd",
+        "test1",
+        "test2",
+        "test3",
         NULL
     };
 
-    joined_str_t *join = join_str_arr(test);
+    joined_strs_t *join = join_str_arr(test);
 
     tree_t *tree = build_tree(join->ptr, join->num_strings);
     lcss_array_list_t **lcss = build_lcss(tree);
@@ -122,7 +122,7 @@ void test_with_static_strings(void)
 #define STR_SEP '\n'
 #define BASE_SIZE 1024
 
-joined_str_t *read_strings(FILE* fp)
+joined_strs_t *read_strings(FILE* fp)
 {
     size_t cur_size = BASE_SIZE;
     size_t num_strings = 1;
@@ -192,7 +192,7 @@ joined_str_t *read_strings(FILE* fp)
 
     str[len++] = '\0';
 
-    joined_str_t *res = malloc(sizeof(joined_str_t));
+    joined_strs_t *res = malloc(sizeof(joined_strs_t));
     res->num_strings = num_strings;
     res->ptr = realloc(str, len); // sizeof(char)
 
@@ -201,7 +201,7 @@ joined_str_t *read_strings(FILE* fp)
 
 int main(void)
 {
-    joined_str_t *join = read_strings(stdin);
+    joined_strs_t *join = read_strings(stdin);
 
     if (join == NULL)
     {
