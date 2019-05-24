@@ -14,7 +14,7 @@ typedef struct joined_str
 }
 joined_str_t;
 
-lcss_array_list_t **tree_to_lcss(tree_t* tree)
+lcss_array_list_t **build_lcss(tree_t* tree)
 {
     post_process_tree(tree);
     process_leaves_pair(tree);
@@ -52,7 +52,6 @@ bool check_end_sym(char end_sym)
     {
         fprintf(stderr, "Too many strings\n");
         fprintf(stderr, "I can't handle more than %d strings :(\n", UCHAR_MAX - SCHAR_MAX - 1);
-        fprintf(stderr, "(char '%d' isn't a valid end symbol)\n", end_sym);
     }
 
     return check;
@@ -86,7 +85,7 @@ joined_str_t *join_str_arr(char **strings)
             j++;
         }
 
-        cat[cat_idx++] = end_sym--; // TODO (?)
+        cat[cat_idx++] = end_sym--;
 
         if (!check_end_sym(end_sym))
         {
@@ -116,10 +115,11 @@ void test_with_static_strings(void)
     joined_str_t *join = join_str_arr(test);
 
     tree_t *tree = build_tree(join->ptr, join->num_strings);
-    lcss_array_list_t **lcss = tree_to_lcss(tree);
+    lcss_array_list_t **lcss = build_lcss(tree);
     print_lcss(tree, lcss);
 }
 
+#define STR_SEP '\n'
 #define BASE_SIZE 1024
 
 joined_str_t *read_strings(FILE* fp)
@@ -145,16 +145,21 @@ joined_str_t *read_strings(FILE* fp)
 
         if (cur_c == EOF)
         {
+            if (last_c == STR_SEP)
+            {
+                num_strings--;
+            }
+
             break;
         }
 
-        if (last_c == '\n' && cur_c == '\n')
+        if (cur_c == STR_SEP)
         {
-            continue;
-        }
+            if (last_c == STR_SEP)
+            {
+                continue;
+            }
 
-        if (cur_c == '\n')
-        {
             str[len++] = end_sym--;
             num_strings++;
 
@@ -205,6 +210,6 @@ int main(void)
     }
 
     tree_t *tree = build_tree(join->ptr, join->num_strings);
-    lcss_array_list_t **lcss = tree_to_lcss(tree);
+    lcss_array_list_t **lcss = build_lcss(tree);
     print_lcss(tree, lcss);
 }
