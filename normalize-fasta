@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ -z "$1" ] || [ -z "$2" ]; then
+if [ -z "$1" ] || [ -z "$2" ] || [ ! -d "$1" ]; then
     echo "$(basename $0) /path/to/fasta/files out-file"
     exit 1
 fi
