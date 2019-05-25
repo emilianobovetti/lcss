@@ -1,0 +1,14 @@
+#!/bin/bash
+
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../env"
+
+dump_file="$DUMP_PATH/$(basename "$0")"
+
+mkdir -p "$DUMP_PATH"
+rm -f "$dump_file"
+
+for i in {0..126}; do
+    ranstr -l 20000 -r a-d >> "$dump_file"
+done
+
+time (cat "$dump_file" | "$LCSS_BIN")

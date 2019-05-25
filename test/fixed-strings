@@ -1,0 +1,10 @@
+#!/bin/bash
+
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../env"
+
+"$LCSS_BIN" <<EOF
+asdasd
+asdasd
+asddasd
+asdasds
+EOF

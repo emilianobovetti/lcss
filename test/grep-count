@@ -1,27 +1,24 @@
 #!/bin/bash
 
-self_path="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-test_path="$self_path/test"
-str_file="$test_path/$(basename "$0")"
-lcss="$self_path/build/lcss"
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../env"
 
-mkdir -p "$test_path"
-rm -f "$str_file"
+dump_file="$DUMP_PATH/$(basename "$0")"
+
+mkdir -p "$DUMP_PATH"
+rm -f "$dump_file"
 
 for i in {0..126}; do
-    ./ranstr -l 20000 -r a-d >> "$str_file"
+    ranstr -l 20000 -r a-d >> "$dump_file"
 done
 
-make
-
-res="$(time (cat "$str_file" | "$lcss"))"
+res="$(time (cat "$dump_file" | "$LCSS_BIN"))"
 
 echo "$res" | while read rec; do
     expected_count="$(echo "$rec" | awk '{ print $1 }')"
     str="$(echo "$rec" | awk '{ print $2 }')"
 
     if [ -n "$str" ]; then
-        if [ $(grep -c "$str" "$str_file") -eq $expected_count ]; then
+        if [ $(grep -c "$str" "$dump_file") -eq $expected_count ]; then
             echo "'$str' found in exactly $expected_count string(s)"
         else
             echo "Found mismatch with '$str'!" >&2

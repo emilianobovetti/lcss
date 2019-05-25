@@ -1,0 +1,15 @@
+#!/bin/bash
+
+BASE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+UTILS_PATH="$BASE_PATH/utils"
+BUILD_PATH="$BASE_PATH/build"
+DUMP_PATH="$BASE_PATH/dump"
+LCSS_BIN="$BUILD_PATH/lcss"
+
+if [ "$(echo "$PATH" | grep -c "$UTILS_PATH")" -lt 1 ]; then
+    chmod u+x "$UTILS_PATH"/*
+
+    export PATH="$PATH:$UTILS_PATH"
+fi
+
+(cd "$BASE_PATH" && make)
