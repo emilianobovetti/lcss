@@ -1,7 +1,5 @@
 #!/bin/bash
 
-. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../env"
-
 if [ -z "$1" ] || [ -z "$2" ] || [ -z "$3" ]; then
     echo "$(basename $0) str_file seq1 seq2"
     exit 1
@@ -12,8 +10,8 @@ str_file="$1"
 seq1="$2"
 seq2="$3"
 
-len1="$(strlength "$seq1")"
-len2="$(strlength "$seq2")"
+len1="$(printf "$seq1" | wc -m)"
+len2="$(printf "$seq2" | wc -m)"
 
 matches="$matches$(grep -o "$seq1.*$seq2" "$str_file")"
 matches="$matches$(grep -o "$seq2.*$seq1" "$str_file")"
