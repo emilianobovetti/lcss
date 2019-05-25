@@ -17,7 +17,7 @@ matches="$matches$(grep -o "$seq1.*$seq2" "$str_file")"
 matches="$matches$(grep -o "$seq2.*$seq1" "$str_file")"
 
 while read line; do
-    count="$(echo "$line" | wc -m)"
+    count="$(printf "$line" | wc -m)"
     dist="$((count - len1 - len2))"
 
     distances="$(printf "%s\n%s" "$dist" "$distances")"
