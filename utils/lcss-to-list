@@ -29,11 +29,12 @@ if ! is-int "$min_common"; then
     exit 1
 fi
 
-while read line; do
-    str_count="$(echo "$line" | awk '{ print $1 }')"
+while read record; do
+    set $record
+    str_count="$1"
 
     if [ "$str_count" -ge "$min_common" ]; then
-        for word in ${line:2}; do
+        for word in "${@:2}"; do
             echo "$word"
         done
     fi

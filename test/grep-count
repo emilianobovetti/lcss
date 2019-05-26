@@ -11,17 +11,18 @@ for i in {0..126}; do
     ranstr -l 20000 -r a-d >> "$dump_file"
 done
 
-res="$(time (cat "$dump_file" | "$LCSS_BIN"))"
+results="$(time (cat "$dump_file" | "$LCSS_BIN"))"
 
-echo "$res" | while read rec; do
-    expected_count="$(echo "$rec" | awk '{ print $1 }')"
-    str="$(echo "$rec" | awk '{ print $2 }')"
+echo "$results" | while read record; do
+    set $record
+    expected_count="$1"
+    sub="$2"
 
-    if [ -n "$str" ]; then
-        if [ $(grep -c "$str" "$dump_file") -eq $expected_count ]; then
-            echo "'$str' found in exactly $expected_count string(s)"
+    if [ -n "$sub" ]; then
+        if [ "$(grep -c "$sub" "$dump_file")" -eq "$expected_count" ]; then
+            echo "'$sub' found in exactly $expected_count string(s)"
         else
-            echo "Found mismatch with '$str'!" >&2
+            echo "Found mismatch with '$sub'!" >&2
             exit 1
         fi
     fi

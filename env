@@ -14,7 +14,10 @@ fi
 
 if [ "$1" = --make ]; then
     (cd "$BASE_PATH" && make)
-elif [ -n "$1" ] && [ "$1" != -- ]; then
+elif [ -z "$1" ]; then
+    echo "please source 'env' with '--' argument" 1>&2
+    exit 1
+elif [ "$1" != -- ]; then
     echo "unrecognized argument '$1' in env" 1>&2
     exit 1
 fi
