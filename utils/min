@@ -1,0 +1,17 @@
+#!/bin/bash -eu
+
+"$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../env"
+
+input=${*:-$(cat)}
+result=
+
+for num in $input; do
+    if is-int "$num"; then
+        [ -z "$result" ] || [ "$num" -lt "$result" ] && result=$num
+    else
+        echo "non-integer expression in $(basename "$0")" 1>&2
+        exit 1
+    fi
+done
+
+[ -z "$result" ] && exit 1 || echo "$result"

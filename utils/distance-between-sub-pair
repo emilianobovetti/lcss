@@ -1,5 +1,7 @@
 #!/bin/bash
 
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../env" --
+
 if [ ! -f "$1" ] || [ -z "$2" ] || [ -z "$3" ]; then
     echo "$(basename $0) str_file seq1 seq2"
     exit 1
@@ -18,25 +20,17 @@ distances=
 while read line; do
     match1_len="$(printf "$line" | grep -o "$seq1.*$seq2" | wc -m)"
     match2_len="$(printf "$line" | grep -o "$seq2.*$seq1" | wc -m)"
-    match1_dist=$((match1_len - len1 - len2))
-    match2_dist=$((match2_len - len1 - len2))
+    min_len="$(min "$match1_len" "$match2_len")"
 
-    if [ "$match1_len" -eq 0 ] || [ "$match2_len" -eq 0 ]; then
+    if [ "$min_len" -eq 0 ]; then
+        min_len="$(max "$match1_len" "$match2_len")"
+    fi
 
-        if [ "$match1_len" -gt 0 ]; then
-            distances="$(printf "%s\n%s" "$match1_dist" "$distances")"
-        elif [ "$match2_len" -gt 0 ]; then
-            distances="$(printf "%s\n%s" "$match2_dist" "$distances")"
-        fi
-
+    if [ "$min_len" -eq 0 ]; then
         continue
     fi
 
-    if [ "$match1_dist" -gt "$match2_dist" ]; then
-        distances="$(printf "%s\n%s" "$match2_dist" "$distances")"
-    else
-        distances="$(printf "%s\n%s" "$match1_dist" "$distances")"
-    fi
+    distances="$(printf "%s\n%s" "$((min_len - len1 - len2))" "$distances")"
 done < "$str_file"
 
 echo "$distances" | sort -n
