@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ ! -f "$1" ]; then
-    echo "$(basename $0) str_file [lcss-file]"
+    echo "$(basename $0) str_file [lcss_file]"
     exit 1
 fi
 
@@ -9,10 +9,7 @@ str_file="$1"
 
 declare -a lcss
 
-while read line; do
-    word_idx=0
+# TODO
 
-    for word in ${line:2}; do
-        echo "$word"
-    done
+while read line; do
 done < "${2:-/dev/stdin}"
