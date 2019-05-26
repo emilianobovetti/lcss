@@ -1,0 +1,27 @@
+#!/bin/bash
+
+"$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../env"
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -m|--min)
+            min="$2"
+            shift
+            ;;
+        -M|--max)
+            max="$2"
+            shift
+            ;;
+        *)
+            echo "unrecognized argument '$1' in $(basename "$0")" 1>&2
+            exit 1
+            ;;
+    esac
+
+    shift
+done
+
+if ! is-int "$min" || ! is-int "$max"; then
+    echo "$(basename $0) --min <m> --max <M>"
+    exit 1
+fi

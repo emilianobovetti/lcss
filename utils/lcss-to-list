@@ -1,0 +1,7 @@
+#!/bin/bash
+
+while read line; do
+    for word in ${line:2}; do
+        echo "$word"
+    done
+done < "${1:-/dev/stdin}"

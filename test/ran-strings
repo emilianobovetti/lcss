@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../env"
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../env" --make
 
 dump_file="$DUMP_PATH/$(basename "$0")"
 

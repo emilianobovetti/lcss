@@ -12,4 +12,9 @@ if [ "$(echo "$PATH" | grep -c "$UTILS_PATH")" -lt 1 ]; then
     export PATH="$PATH:$UTILS_PATH"
 fi
 
-(cd "$BASE_PATH" && make)
+if [ "$1" = --make ]; then
+    (cd "$BASE_PATH" && make)
+elif [ -n "$1" ]; then
+    echo "unrecognized argument '$1' in env" 1>&2
+    exit 1
+fi
