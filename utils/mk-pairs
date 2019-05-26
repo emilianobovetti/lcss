@@ -11,7 +11,6 @@ echo "$strings" | while read str1; do
     echo "$strings" | while read str2; do
         if [ "$str1" != "$str2" ]; then
             echo "$str1 $str2"
-            echo "$str2 $str1"
         fi
     done
 done

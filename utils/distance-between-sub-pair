@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ -z "$1" ] || [ -z "$2" ] || [ -z "$3" ]; then
+if [ ! -f "$1" ] || [ -z "$2" ] || [ -z "$3" ]; then
     echo "$(basename $0) str_file seq1 seq2"
     exit 1
 fi
@@ -13,14 +13,30 @@ seq2="$3"
 len1="$(printf "$seq1" | wc -m)"
 len2="$(printf "$seq2" | wc -m)"
 
-matches="$matches$(grep -o "$seq1.*$seq2" "$str_file")"
-matches="$matches$(grep -o "$seq2.*$seq1" "$str_file")"
+distances=
 
 while read line; do
-    match_len="$(printf "$line" | wc -m)"
-    dist="$((match_len - len1 - len2))"
+    match1_len="$(printf "$line" | grep -o "$seq1.*$seq2" | wc -m)"
+    match2_len="$(printf "$line" | grep -o "$seq2.*$seq1" | wc -m)"
+    match1_dist=$((match1_len - len1 - len2))
+    match2_dist=$((match2_len - len1 - len2))
 
-    distances="$(printf "%s\n%s" "$dist" "$distances")"
-done <<< "$matches"
+    if [ "$match1_len" -eq 0 ] || [ "$match2_len" -eq 0 ]; then
+
+        if [ "$match1_len" -gt 0 ]; then
+            distances="$(printf "%s\n%s" "$match1_dist" "$distances")"
+        elif [ "$match2_len" -gt 0 ]; then
+            distances="$(printf "%s\n%s" "$match2_dist" "$distances")"
+        fi
+
+        continue
+    fi
+
+    if [ "$match1_dist" -gt "$match2_dist" ]; then
+        distances="$(printf "%s\n%s" "$match2_dist" "$distances")"
+    else
+        distances="$(printf "%s\n%s" "$match1_dist" "$distances")"
+    fi
+done < "$str_file"
 
 echo "$distances" | sort -n
