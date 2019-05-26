@@ -11,20 +11,42 @@ norm_strings="$(normalize-fasta "$1")"
 
 echo "isn't that cool?"
 echo "$norm_strings" | distance-between-sub-pair tgatgcgtgatat gtaaacgccttca
+echo "==="
 
 echo "anyway, let's do the lcss"
+echo "==="
+
 lcss="$(echo "$norm_strings" | "$LCSS_BIN" | lcss-to-list --min-common 20)"
 
 rep_in_lcss="$(echo "$lcss" | "$LCSS_BIN" | lcss-to-list --min-common 2 | keep-str-in-range --min 3)"
 
-rep_regexp=
+regexp=
 
 while read sub; do
-    if [ -z "$rep_regexp" ]; then
-        rep_regexp="$sub"
+    if [ -z "$regexp" ]; then
+        regexp="$sub"
     else
-        rep_regexp="$rep_regexp|$sub"
+        regexp="$regexp|$sub"
     fi
 done <<< "$rep_in_lcss"
 
-grep -E --color=auto "$rep_regexp" <<< "$lcss"
+echo "repetitions in substrings:"
+grep -E --color=always "$regexp" <<< "$lcss"
+echo "==="
+
+#
+#short_lcss="$(echo "$lcss" | keep-str-in-range --min 3 --max 100)"
+#
+
+regexp=
+
+while read sub; do
+    if [ -z "$regexp" ]; then
+        regexp="$sub"
+    else
+        regexp="$regexp|$sub"
+    fi
+done <<< "$lcss"
+
+echo "matching 'short' substrings in given sequences:"
+grep -E --color=always "$regexp" <<< "$norm_strings" | awk '{ print $0, "\n\n---\n" }'

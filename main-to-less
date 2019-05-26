@@ -1,0 +1,13 @@
+#!/bin/bash
+
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/env" --
+
+if [ ! -d "$1" ]; then
+    echo "$(basename $0) /path/to/fasta/dir"
+    exit 1
+fi
+
+dump_file="$DUMP_PATH/$(basename "$0")"
+
+#script -q -c "$BASE_PATH/main \"$1\"" "$dump_file"
+$BASE_PATH/main "$1" "$dump_file" | less -R
