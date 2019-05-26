@@ -2,24 +2,23 @@
 
 . "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../env" --
 
-if [ ! -f "$1" ] || [ -z "$2" ] || [ -z "$3" ]; then
-    echo "$(basename $0) str_file seq1 seq2"
+if [ -z "$1" ] || [ -z "$2" ] || [ -n "$3" ] && [ ! -f "$3" ]; then
+    echo "$(basename $0) sub1 sub2 [str_file]"
     exit 1
 fi
 
-str_file="$1"
+str_file="${3:-/dev/stdin}"
+sub1="$1"
+sub2="$2"
 
-seq1="$2"
-seq2="$3"
-
-len1="$(printf "$seq1" | wc -m)"
-len2="$(printf "$seq2" | wc -m)"
+len1="$(printf "$sub1" | wc -m)"
+len2="$(printf "$sub2" | wc -m)"
 
 distances=
 
-while read line; do
-    match1_len="$(printf "$line" | grep -o "$seq1.*$seq2" | wc -m)"
-    match2_len="$(printf "$line" | grep -o "$seq2.*$seq1" | wc -m)"
+while read string; do
+    match1_len="$(printf "$string" | grep -o "$sub1.*$sub2" | wc -m)"
+    match2_len="$(printf "$string" | grep -o "$sub2.*$sub1" | wc -m)"
     min_len="$(min "$match1_len" "$match2_len")"
 
     if [ "$min_len" -eq 0 ]; then
