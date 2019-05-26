@@ -1,0 +1,30 @@
+#!/bin/bash
+
+if [ ! -d "$1" ]; then
+    echo "$(basename $0) /path/to/fasta/dir"
+    exit 1
+fi
+
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/env" --make
+
+norm_strings="$(normalize-fasta "$1")"
+
+echo "isn't that cool?"
+echo "$norm_strings" | distance-between-sub-pair tgatgcgtgatat gtaaacgccttca
+
+echo "anyway, let's do the lcss"
+lcss="$(echo "$norm_strings" | "$LCSS_BIN" | lcss-to-list --min-common 20)"
+
+rep_in_lcss="$(echo "$lcss" | "$LCSS_BIN" | lcss-to-list --min-common 2 | keep-str-in-range --min 3)"
+
+rep_regexp=
+
+while read sub; do
+    if [ -z "$rep_regexp" ]; then
+        rep_regexp="$sub"
+    else
+        rep_regexp="$rep_regexp|$sub"
+    fi
+done <<< "$rep_in_lcss"
+
+grep -E --color=auto "$rep_regexp" <<< "$lcss"

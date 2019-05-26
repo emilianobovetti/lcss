@@ -2,6 +2,8 @@
 
 . "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../env" --
 
+max=2147483647
+
 while [ $# -gt 0 ]; do
     case "$1" in
         -m|--min)
