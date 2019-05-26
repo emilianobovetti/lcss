@@ -22,6 +22,14 @@ while [ $# -gt 0 ]; do
 done
 
 if ! is-int "$min" || ! is-int "$max"; then
-    echo "$(basename $0) --min <m> --max <M>"
+    echo "$(basename $0) --min <m> --max <M>" 1>&2
     exit 1
 fi
+
+while read line; do
+    line_len="$(printf "$line" | wc -m)"
+
+    if [ "$line_len" -ge "$min" ] && [ "$line_len" -le "$max" ]; then
+        echo "$line"
+    fi
+done

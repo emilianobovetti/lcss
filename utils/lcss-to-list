@@ -1,7 +1,40 @@
 #!/bin/bash
 
+"$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../env"
+
+input_file=
+min_common=0
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --min-common)
+            min_common="$2"
+            shift
+            ;;
+        *)
+            if [ -z "$input_file" ]; then
+                input_file="$1"
+            else
+                echo "unrecognized argument '$1' in $(basename "$0")" 1>&2
+                exit 1
+            fi
+            ;;
+    esac
+
+    shift
+done
+
+if ! is-int "$min_common"; then
+    echo "$(basename $0) -min-common <num>" 1>&2
+    exit 1
+fi
+
 while read line; do
-    for word in ${line:2}; do
-        echo "$word"
-    done
-done < "${1:-/dev/stdin}"
+    str_count="$(echo "$line" | awk '{ print $1 }')"
+
+    if [ "$str_count" -ge "$min_common" ]; then
+        for word in ${line:2}; do
+            echo "$word"
+        done
+    fi
+done < "${input_file:-/dev/stdin}"
