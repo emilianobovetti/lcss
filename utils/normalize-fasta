@@ -1,11 +1,13 @@
 #!/bin/bash
 
-if [ ! -d "$1" ] || [ -z "$2" ]; then
-    echo "$(basename $0) /path/to/fasta/dir out-file"
+if [ ! -d "$1" ]; then
+    echo "$(basename $0) /path/to/fasta/dir [out-file]"
     exit 1
 fi
 
+out="${2:-/dev/stdout}"
+
 for file in "$1"/*; do
-    sed '1d' "$file" | tr -d [:space:] >> "$2"
-    printf "\n" >> "$2"
+    sed '1d' "$file" | tr -d [:space:] >> "$out"
+    printf "\n" >> "$out"
 done
