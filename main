@@ -49,7 +49,7 @@ while read sub; do
         regexp="($sub)"
         colors="$ccode"
     else
-        # Avoid black & white (15 & 16)
+        # Skip black & white (codes 15 and 16)
         if [ "$ccode" -eq 15 ]; then
             ccode=17
         fi
