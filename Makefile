@@ -1,12 +1,12 @@
-build_path := $(CURDIR)/build
-src_path := $(CURDIR)/src
-target := $(build_path)/lcss
+BUILD_DIR := $(CURDIR)/build
+SRC_DIR := $(CURDIR)/src
+BIN_TARGET := $(BUILD_DIR)/lcss
 
 .PHONY: exe
 exe: build
-	@cd $(src_path) && gcc -O3 *.c -o $(target)
+	@cd $(SRC_DIR) && gcc -O3 *.c -o $(BIN_TARGET)
 
 build:
-	@mkdir -p $(build_path)
+	@mkdir -p $(BUILD_DIR)
 
 all: exe

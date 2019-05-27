@@ -9,44 +9,56 @@ fi
 
 norm_strings="$(normalize-fasta "$1")"
 
-echo "isn't that cool?"
-echo "$norm_strings" | distance-between-sub-pair tgatgcgtgatat gtaaacgccttca
-echo "==="
-
-echo "anyway, let's do the lcss"
-echo "==="
+#
+#echo "isn't that cool?"
+#echo "$norm_strings" | distance-between-sub-pair tgatgcgtgatat gtaaacgccttca
+#echo "==="
+#
+#echo "anyway, let's do the lcss"
+#echo "==="
+#
 
 lcss="$(echo "$norm_strings" | "$LCSS_BIN" | lcss-to-list --min-common 20)"
 
-rep_in_lcss="$(echo "$lcss" | "$LCSS_BIN" | lcss-to-list --min-common 2 | keep-str-in-range --min 3)"
-
-regexp=
-
-while read sub; do
-    if [ -z "$regexp" ]; then
-        regexp="$sub"
-    else
-        regexp="$regexp|$sub"
-    fi
-done <<< "$rep_in_lcss"
-
-echo "repetitions in substrings:"
-grep -E --color=always "$regexp" <<< "$lcss"
-echo "==="
-
 #
+#rep_in_lcss="$(echo "$lcss" | "$LCSS_BIN" | lcss-to-list --min-common 2 | keep-str-in-range --min 3)"
+#
+#regexp=
+#
+#while read sub; do
+#    if [ -z "$regexp" ]; then
+#        regexp="$sub"
+#    else
+#        regexp="$regexp|$sub"
+#    fi
+#done <<< "$rep_in_lcss"
+#
+#echo "repetitions in substrings:"
+#grep -E --color=always "$regexp" <<< "$lcss"
+#echo "==="
+##
 #short_lcss="$(echo "$lcss" | keep-str-in-range --min 3 --max 100)"
 #
 
+idx=0
 regexp=
+colors=
 
 while read sub; do
     if [ -z "$regexp" ]; then
-        regexp="$sub"
+        regexp="($sub)"
+        colors="$idx"
     else
-        regexp="$regexp|$sub"
+        regexp="$regexp|($sub)"
+        colors="$colors,$idx"
     fi
+
+    idx=$((idx + 1))
 done <<< "$lcss"
 
-echo "matching 'short' substrings in given sequences:"
-grep -E --color=always "$regexp" <<< "$norm_strings" | awk '{ print $0, "\n\n---\n" }'
+echo "matching substrings in given sequences:"
+colout "$regexp" "$colors" <<< "$norm_strings"
+
+#
+#grep -E --color=always "$regexp" <<< "$norm_strings" | awk '{ print $0, "\n\n---\n" }'
+#

@@ -1,0 +1,5 @@
+#!/bin/bash -eu
+
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../env" --
+
+python3 "$COLOUT_DIR/colout/colout.py" "$@"

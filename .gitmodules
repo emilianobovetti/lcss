@@ -1,0 +1,4 @@
+[submodule "deps/colout"]
+	path = deps/colout
+	url = https://github.com/nojhan/colout
+	branch = master

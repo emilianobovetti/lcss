@@ -9,3 +9,4 @@
 - [gcc](https://gcc.gnu.org/)
 - [GNU Make](https://www.gnu.org/software/make/)
 - [GNU Bash](https://www.gnu.org/software/bash/)
+- [git](https://git-scm.com/)

@@ -1,23 +1,50 @@
 #!/bin/bash
 
-BASE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-UTILS_PATH="$BASE_PATH/utils"
-BUILD_PATH="$BASE_PATH/build"
-DUMP_PATH="$BASE_PATH/dump"
-LCSS_BIN="$BUILD_PATH/lcss"
+BASE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+UTILS_DIR="$BASE_DIR/utils"
+BUILD_DIR="$BASE_DIR/build"
+DUMP_DIR="$BASE_DIR/dump"
+LCSS_BIN="$BUILD_DIR/lcss"
 
-if [ "$(echo "$PATH" | grep -c "$UTILS_PATH")" -lt 1 ]; then
-    chmod u+x "$UTILS_PATH"/*
-
-    export PATH="$PATH:$UTILS_PATH"
-fi
+DEPS_DIR="$BASE_DIR/deps"
+COLOUT_DIR="$DEPS_DIR/colout"
 
 if [ "$1" = --make ]; then
-    (cd "$BASE_PATH" && make)
+    (cd "$BASE_DIR" && make)
 elif [ -z "$1" ]; then
     echo "please source 'env' with '--' argument" 1>&2
     exit 1
 elif [ "$1" != -- ]; then
     echo "unrecognized argument '$1' in env" 1>&2
     exit 1
+fi
+
+if [ "$(echo "$PATH" | grep -c "$UTILS_DIR")" -lt 1 ]; then
+    chmod u+x "$UTILS_DIR"/*
+
+    export PATH="$PATH:$UTILS_DIR"
+fi
+
+if [ ! -d "$DUMP_DIR" ]; then
+    mkdir "$DUMP_DIR"
+fi
+
+if [ ! -d "$DEPS_DIR" ]; then
+    mkdir "$DEPS_DIR"
+fi
+
+if [ ! -d "$COLOUT_DIR" ]; then
+    (cd "$BASE_DIR" && git submodule update)
+
+    COLOUT_SCRIPT="$UTILS_DIR/colout"
+
+    echo "#!/bin/bash -eu" > "$COLOUT_SCRIPT"
+    echo >> "$COLOUT_SCRIPT"
+    echo '. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../env" --' >> "$COLOUT_SCRIPT"
+    echo >> "$COLOUT_SCRIPT"
+    echo 'python3 "$COLOUT_DIR/colout/colout.py" "$@"' >> "$COLOUT_SCRIPT"
+
+    chmod u+x "$COLOUT_SCRIPT"
+
+    COLOUT_SCRIPT=
 fi
