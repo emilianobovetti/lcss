@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../env" --
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../mk-env" --
 
 if [ -z "$1" ] || [ -n "$2" ] && [ ! -f "$2" ]; then
     echo "$(basename $0) substr [str_file]"

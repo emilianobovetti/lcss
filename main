@@ -5,7 +5,7 @@ if [ ! -d "$1" ]; then
     exit 1
 fi
 
-. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/env" --make
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/mk-env" --make
 
 norm_strings="$(normalize-fasta "$1")"
 

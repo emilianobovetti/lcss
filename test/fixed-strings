@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../env" --make
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../mk-env" --make
 
 "$LCSS_BIN" <<EOF
 asdasd

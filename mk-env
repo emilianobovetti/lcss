@@ -12,10 +12,10 @@ COLOUT_DIR="$DEPS_DIR/colout"
 if [ "$1" = --make ]; then
     (cd "$BASE_DIR" && make)
 elif [ -z "$1" ]; then
-    echo "please source 'env' with '--' argument" 1>&2
+    echo "please source 'mk-env' with '--' argument" 1>&2
     exit 1
 elif [ "$1" != -- ]; then
-    echo "unrecognized argument '$1' in env" 1>&2
+    echo "unrecognized argument '$1' in mk-env" 1>&2
     exit 1
 fi
 
@@ -40,12 +40,12 @@ DEP_BOOT_SCRIPT=$(cat <<EOF
 # This file is auto-generated, please do not edit directly.
 #
 
-. "\$(cd "\$(dirname "\${BASH_SOURCE[0]}")" && pwd)/../env" --
+. "\$(cd "\$(dirname "\${BASH_SOURCE[0]}")" && pwd)/../mk-env" --
 
 EOF
 )
 
-if [ -z "$(ls "$COLOUT_DIR")" ]; then
+if [ ! -d "$COLOUT_DIR" ] || [ -z "$(ls "$COLOUT_DIR")" ]; then
     (cd "$BASE_DIR" && git submodule init && git submodule update)
     (cd "$COLOUT_DIR" && git stash)
 

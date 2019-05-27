@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../env" --
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../mk-env" --
 
 if [ -z "$1" ] || [ -z "$2" ] || [ -n "$3" ] && [ ! -f "$3" ]; then
     echo "$(basename $0) sub1 sub2 [str_file]"
