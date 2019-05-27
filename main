@@ -40,25 +40,31 @@ lcss="$(echo "$norm_strings" | "$LCSS_BIN" | lcss-to-list --min-common 10)"
 #short_lcss="$(echo "$lcss" | keep-str-in-range --min 3 --max 100)"
 #
 
-idx=0
+ccode=1
 regexp=
 colors=
 
 while read sub; do
     if [ -z "$regexp" ]; then
         regexp="($sub)"
-        colors="$idx"
+        colors="$ccode"
     else
+        # Avoid black & white (15 & 16)
+        if [ "$ccode" -eq 15 ]; then
+            ccode=17
+        fi
+
+        if [ "$ccode" -ge 230 ]; then
+            echo "too much substrings, cannot pick another color code" 1>&2
+            exit 1
+        fi
+
         regexp="$regexp|($sub)"
-        colors="$colors,$idx"
+        colors="$colors,$ccode"
     fi
 
-    idx=$((idx + 1))
+    ccode=$((ccode + 1))
 done <<< "$lcss"
-
-if [ "$idx" -gt 255 ]; then
-    echo "error in color-picking" 1>&2
-fi
 
 echo "matching substrings in given sequences:"
 colout "$regexp" "$colors" <<< "$norm_strings" | awk '{ print $0, "\n\n---\n" }'

@@ -10,4 +10,4 @@
 - [GNU Make](https://www.gnu.org/software/make/)
 - [GNU Bash](https://www.gnu.org/software/bash/)
 - [git](https://git-scm.com/)
-- [colout](https://github.com/nojhan/colout) <small>which requires [python3](https://www.python.org/)</small>
+- [colout](https://github.com/nojhan/colout) - which requires [python3](https://www.python.org/)
