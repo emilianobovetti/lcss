@@ -21,7 +21,7 @@ norm_strings="$(normalize-fasta "$1")"
 lcss="$(echo "$norm_strings" | "$LCSS_BIN" | lcss-to-list --min-common 10)"
 
 #
-#rep_in_lcss="$(echo "$lcss" | "$LCSS_BIN" | lcss-to-list --min-common 2 | keep-str-in-range --min 3)"
+#rep_in_lcss="$(echo "$lcss" | "$LCSS_BIN" | lcss-to-list --min-common 2 | filter-by-length --min 3)"
 #
 #regexp=
 #
@@ -37,7 +37,7 @@ lcss="$(echo "$norm_strings" | "$LCSS_BIN" | lcss-to-list --min-common 10)"
 #grep -E --color=always "$regexp" <<< "$lcss"
 #echo "==="
 ##
-#short_lcss="$(echo "$lcss" | keep-str-in-range --min 3 --max 100)"
+#short_lcss="$(echo "$lcss" | filter-by-length --min 3 --max 100)"
 #
 
 ccode=1
