@@ -33,22 +33,28 @@ if [ ! -d "$DEPS_DIR" ]; then
     mkdir "$DEPS_DIR"
 fi
 
+DEP_BOOT_SCRIPT=$(cat <<EOF
+#!/bin/bash -eu
+
+#
+# This file is auto-generated, please do not edit directly.
+#
+
+. "\$(cd "\$(dirname "\${BASH_SOURCE[0]}")" && pwd)/../env" --
+
+EOF
+)
+
 if [ ! -d "$COLOUT_DIR" ]; then
     (cd "$BASE_DIR" && git submodule update)
 
     COLOUT_SCRIPT="$UTILS_DIR/colout"
 
-    echo "#!/bin/bash -eu" > "$COLOUT_SCRIPT"
-    echo >> "$COLOUT_SCRIPT"
-    echo "#" >> "$COLOUT_SCRIPT"
-    echo "# This file is auto-generated, please do not edit directly." >> "$COLOUT_SCRIPT"
-    echo "#" >> "$COLOUT_SCRIPT"
-    echo >> "$COLOUT_SCRIPT"
-    echo '. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../env" --' >> "$COLOUT_SCRIPT"
-    echo >> "$COLOUT_SCRIPT"
+    echo "$DEP_BOOT_SCRIPT" > "$COLOUT_SCRIPT"
     echo 'python3 "$COLOUT_DIR/colout/colout.py" "$@"' >> "$COLOUT_SCRIPT"
 
     chmod u+x "$COLOUT_SCRIPT"
-
-    COLOUT_SCRIPT=
 fi
+
+COLOUT_SCRIPT=
+DEP_BOOT_SCRIPT=
