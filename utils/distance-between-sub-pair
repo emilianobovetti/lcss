@@ -17,8 +17,8 @@ len2="$(printf "$sub2" | wc -m)"
 distances=
 
 while read string; do
-    match1_len="$(printf "$string" | grep -o "$sub1.*$sub2" | wc -m)"
-    match2_len="$(printf "$string" | grep -o "$sub2.*$sub1" | wc -m)"
+    match1_len="$(echo "$string" | grep -o "$sub1.*$sub2" | wc -m)"
+    match2_len="$(echo "$string" | grep -o "$sub2.*$sub1" | wc -m)"
     min_len="$(min "$match1_len" "$match2_len")"
 
     if [ "$min_len" -eq 0 ]; then

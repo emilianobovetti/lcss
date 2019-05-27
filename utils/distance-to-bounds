@@ -9,14 +9,13 @@ fi
 
 str_file="${2:-/dev/stdin}"
 substr="$1"
-substr_len="$(printf "$substr" | wc -m)"
+substr_len="$(echo "$substr" | wc -m)"
 
 while read string; do
-    len_from_start="$(printf "$string" | grep -o "^.*$substr" | wc -m)"
-    len_to_end="$(printf "$string" | grep -o "$substr.*\$" | wc -m)"
+    len_from_start="$(echo "$string" | grep -o "^.*$substr" | wc -m)"
+    len_to_end="$(echo "$string" | grep -o "$substr.*\$" | wc -m)"
 
     if [ "$len_from_start" -gt 0 ] && [ "$len_to_end" -gt 0 ]; then
-        # -1 because `wc -m` counts the "\n" printed by `grep`
-        echo "$((len_from_start - 1 - substr_len))" - "$((len_to_end - 1 - substr_len))"
+        echo "$((len_from_start - substr_len))" - "$((len_to_end - substr_len))"
     fi
 done < "$str_file"
