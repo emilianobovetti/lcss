@@ -29,7 +29,8 @@ while read string; do
         continue
     fi
 
-    distances="$(printf "%s\n%s" "$((min_len - len1 - len2))" "$distances")"
+    # -1 because `wc -m` counts the "\n" printed by `grep`
+    distances="$(printf "%s\n%s" "$((min_len - 1 - len1 - len2))" "$distances")"
 done < "$str_file"
 
 echo "$distances" | sort -n
