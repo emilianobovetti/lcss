@@ -40,6 +40,10 @@ if [ ! -d "$COLOUT_DIR" ]; then
 
     echo "#!/bin/bash -eu" > "$COLOUT_SCRIPT"
     echo >> "$COLOUT_SCRIPT"
+    echo "#" >> "$COLOUT_SCRIPT"
+    echo "# This file is auto-generated, please do not edit directly." >> "$COLOUT_SCRIPT"
+    echo "#" >> "$COLOUT_SCRIPT"
+    echo >> "$COLOUT_SCRIPT"
     echo '. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../env" --' >> "$COLOUT_SCRIPT"
     echo >> "$COLOUT_SCRIPT"
     echo 'python3 "$COLOUT_DIR/colout/colout.py" "$@"' >> "$COLOUT_SCRIPT"

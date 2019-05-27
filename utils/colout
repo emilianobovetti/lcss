@@ -1,5 +1,9 @@
 #!/bin/bash -eu
 
+#
+# This file is auto-generated, please do not edit directly.
+#
+
 . "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../env" --
 
 python3 "$COLOUT_DIR/colout/colout.py" "$@"
