@@ -28,10 +28,10 @@ if ! is-int "$min" || ! is-int "$max"; then
     exit 1
 fi
 
-while read line; do
-    line_len="$(printf "$line" | wc -m)"
+while read substr; do
+    substr_len="$(printf "$substr" | wc -m)"
 
-    if [ "$line_len" -ge "$min" ] && [ "$line_len" -le "$max" ]; then
-        echo "$line"
+    if [ "$substr_len" -ge "$min" ] && [ "$substr_len" -le "$max" ]; then
+        echo "$substr"
     fi
 done

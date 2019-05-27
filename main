@@ -36,7 +36,7 @@ lcss="$(echo "$norm_strings" | "$LCSS_BIN" | lcss-to-list --min-common 10)"
 #echo "repetitions in substrings:"
 #grep -E --color=always "$regexp" <<< "$lcss"
 #echo "==="
-##
+#
 #short_lcss="$(echo "$lcss" | filter-by-length --min 3 --max 100)"
 #
 
@@ -67,7 +67,7 @@ while read sub; do
 done <<< "$lcss"
 
 echo "matching substrings in given sequences:"
-colout "$regexp" "$colors" <<< "$norm_strings" | awk '{ print $0, "\n\n---\n" }'
+echo "$norm_strings" | colout "$regexp" "$colors" | awk '{ print $0, "\n\n---\n" }'
 
 #
 #grep -E --color=always "$regexp" <<< "$norm_strings" | awk '{ print $0, "\n\n---\n" }'
