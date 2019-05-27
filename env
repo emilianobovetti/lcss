@@ -45,8 +45,9 @@ DEP_BOOT_SCRIPT=$(cat <<EOF
 EOF
 )
 
-if [ ! -d "$COLOUT_DIR" ]; then
-    (cd "$BASE_DIR" && git submodule update)
+if [ -z "$(ls "$COLOUT_DIR")" ]; then
+    (cd "$BASE_DIR" && git submodule init && git submodule update)
+    (cd "$COLOUT_DIR" && git stash)
 
     COLOUT_SCRIPT="$UTILS_DIR/colout"
 
