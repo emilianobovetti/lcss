@@ -37,11 +37,10 @@ def compile_regex(strings):
         else:
             regex += '['
 
-            try:
-                while True:
-                    regex += char_set.pop()
-            except KeyError:
-                regex += ']'
+            for char in sorted(char_set):
+                regex += char
+
+            regex += ']'
 
     if in_tail:
         regex += ')?'
