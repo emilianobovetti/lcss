@@ -40,7 +40,7 @@ DEP_BOOT_SCRIPT=$(cat <<EOF
 # This file is auto-generated, please do not edit directly.
 #
 
-. "\$(cd "\$(dirname "\${BASH_SOURCE[0]}")" && pwd)/../mk-env" --
+. "\$(cd "\$(dirname "\${BASH_SOURCE[0]}")/.." && pwd)/mk-env" --
 
 EOF
 )

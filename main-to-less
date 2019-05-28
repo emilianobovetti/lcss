@@ -7,10 +7,4 @@ if [ ! -d "$1" ]; then
     exit 1
 fi
 
-#
-#dump_file="$DUMP_DIR/$(basename "$0")"
-#
-#script -q -c "$BASE_DIR/main \"$1\"" "$dump_file"
-#
-
 "$BASE_DIR/main" "$1" | less -R

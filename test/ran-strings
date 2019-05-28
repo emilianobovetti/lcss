@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../mk-env" --make
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/mk-env" --make
 
 dump_file="$DUMP_DIR/$(basename "$0")"
 rm -f "$dump_file"

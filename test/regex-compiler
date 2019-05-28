@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../mk-env" --
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/mk-env" --
 
 strings=$(cat <<EOF
 tgatgcgtgatatccggcaggttcttgagcgctggggggcatgggcggcaaataaccatgaggatgttacatggtcgcccattgctgccggatttaagaggctgatccccgaaaaagtaaaatcacgtccacagtgttgtgacgatgacgcgatgattatatgcgggtgtatggctcgccttaacaggaacaacagcgatctgcatgacttgctggttgattattacgtgttgggggagacgttcatggcgctggcacggaaacatgggtgctctgacacctgtataggtaaacgccttca
