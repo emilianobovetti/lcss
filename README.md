@@ -10,4 +10,5 @@
 - [gcc](https://gcc.gnu.org/)
 - [GNU Make](https://www.gnu.org/software/make/)
 - [GNU Bash](https://www.gnu.org/software/bash/)
-- [colout](https://github.com/nojhan/colout) - which requires [python3](https://www.python.org/)
+- [python3](https://www.python.org/)
+- [colout](https://github.com/nojhan/colout)
