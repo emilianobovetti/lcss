@@ -1,0 +1,59 @@
+#!/usr/bin/env python3
+
+import sys
+
+def compile_regex(strings):
+
+    def process_char(idx):
+        char_set = set()
+
+        for str in strings:
+            try:
+                char_set.add(str[idx])
+            except IndexError:
+                char_set.add(None)
+
+        return char_set
+
+    max_len = 0
+
+    for str in strings:
+        max_len = max(max_len, len(str))
+
+    regex = ''
+    in_tail = False
+
+    for idx in range(0, max_len):
+        char_set = process_char(idx)
+
+        if not in_tail and None in char_set:
+            regex += '('
+            in_tail = True
+
+        char_set.discard(None)
+
+        if len(char_set) == 1:
+            regex += char_set.pop()
+        else:
+            regex += '['
+
+            try:
+                while True:
+                    regex += char_set.pop()
+            except KeyError:
+                regex += ']'
+
+    if in_tail:
+        regex += ')?'
+
+    return regex
+
+strings = []
+
+for line in sys.stdin:
+    line = line.strip()
+
+    if line:
+        strings.append(line)
+
+print(compile_regex(strings))
