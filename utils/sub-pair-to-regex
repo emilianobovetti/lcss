@@ -1,0 +1,10 @@
+#!/bin/bash
+
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/mk-env" --
+
+if [ -z "$1" ] || [ -z "$2" ]; then
+    echo "$(basename $0) sub1 sub2 [path/to/norm_strings]"
+    exit 1
+fi
+
+grep -o "$1.*$2" | regex-compiler

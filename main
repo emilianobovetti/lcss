@@ -10,18 +10,23 @@ fi
 norm_strings="$(normalize-fasta "$1")"
 
 #
+# Distance between single pair
+#
 #echo "isn't that cool?"
-#echo "$norm_strings" | distance-between-sub-pair tgatgcgtgatat gtaaacgccttca
+#echo "$norm_strings" | distances-between-sub-pair tgatgcgtgatat gtaaacgccttca
 #echo "==="
 #
 #echo "anyway, let's do the lcss"
 #echo "==="
 #
 
-lcss="$(echo "$norm_strings" | "$LCSS_BIN" | lcss-to-list --min-common 10)"
+raw_lcss="$(echo "$norm_strings" | "$LCSS_BIN")"
+lcss_list="$(echo "$raw_lcss" | lcss-to-list --min-common 10)"
 
 #
-#rep_in_lcss="$(echo "$lcss" | "$LCSS_BIN" | lcss-to-list --min-common 2 | filter-by-length --min 3)"
+# Lcss's lcss
+#
+#rep_in_lcss="$(echo "$lcss_list" | "$LCSS_BIN" | lcss-to-list --min-common 2 | filter-by-length --min 3)"
 #
 #regexp=
 #
@@ -34,41 +39,59 @@ lcss="$(echo "$norm_strings" | "$LCSS_BIN" | lcss-to-list --min-common 10)"
 #done <<< "$rep_in_lcss"
 #
 #echo "repetitions in substrings:"
-#grep -E --color=always "$regexp" <<< "$lcss"
+#grep -E --color=always "$regexp" <<< "$lcss_list"
 #echo "==="
 #
-#short_lcss="$(echo "$lcss" | filter-by-length --min 3 --max 100)"
+#short_lcss="$(echo "$lcss_list" | filter-by-length --min 3 --max 100)"
 #
 
-ccode=1
-regexp=
-colors=
+#
+# Match lcss in norm_strings witch coloring
+#
+#ccode=1
+#regexp=
+#colors=
+#
+#while read sub; do
+#    if [ -z "$regexp" ]; then
+#        regexp="($sub)"
+#        colors="$ccode"
+#    else
+#        # Skip black & white (codes 15 and 16)
+#        if [ "$ccode" -eq 15 ]; then
+#            ccode=17
+#        fi
+#
+#        if [ "$ccode" -ge 230 ]; then
+#            echo "too much substrings, cannot pick another color code" 1>&2
+#            exit 1
+#        fi
+#
+#        regexp="$regexp|($sub)"
+#        colors="$colors,$ccode"
+#    fi
+#
+#    ccode=$((ccode + 1))
+#done <<< "$lcss_list"
+#
+#echo "matching substrings in given sequences:"
+#echo "$norm_strings" | colout "$regexp" "$colors" | awk '{ print $0, "\n\n---\n" }'
 
-while read sub; do
-    if [ -z "$regexp" ]; then
-        regexp="($sub)"
-        colors="$ccode"
-    else
-        # Skip black & white (codes 15 and 16)
-        if [ "$ccode" -eq 15 ]; then
-            ccode=17
-        fi
+#
+# Distance between multiple pairs
+#
+echo "==="
 
-        if [ "$ccode" -ge 230 ]; then
-            echo "too much substrings, cannot pick another color code" 1>&2
-            exit 1
-        fi
+while read pair; do
+    distances="$(echo "$norm_strings" | distances-between-sub-pair $pair)"
 
-        regexp="$regexp|($sub)"
-        colors="$colors,$ccode"
+    match_count="$(echo "$distances" | wc -l)"
+    min_dis="$(echo "$distances" | head -n 1)"
+    max_dis="$(echo "$distances" | tail -n 1)"
+
+    if [ "$match_count" -gt 0 ]; then
+        echo "in $match_count strings [$min_dis, $max_dis]: $pair"
     fi
+done <<< "$(echo "$raw_lcss" | lcss-to-list --min-common 25 | mk-pairs)"
 
-    ccode=$((ccode + 1))
-done <<< "$lcss"
-
-echo "matching substrings in given sequences:"
-echo "$norm_strings" | colout "$regexp" "$colors" | awk '{ print $0, "\n\n---\n" }'
-
-#
-#grep -E --color=always "$regexp" <<< "$norm_strings" | awk '{ print $0, "\n\n---\n" }'
-#
+echo "==="
