@@ -8,42 +8,8 @@ fi
 . "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/mk-env" --make
 
 norm_strings="$(normalize-fasta "$1")"
-
-#
-# Distance between single pair
-#
-#echo "isn't that cool?"
-#echo "$norm_strings" | distances-between-sub-pair tgatgcgtgatat gtaaacgccttca
-#echo "==="
-#
-#echo "anyway, let's do the lcss"
-#echo "==="
-#
-
 raw_lcss="$(echo "$norm_strings" | "$LCSS_BIN")"
 lcss_list="$(echo "$raw_lcss" | lcss-to-list --min-common 10)"
-
-#
-# Lcss's lcss
-#
-#rep_in_lcss="$(echo "$lcss_list" | "$LCSS_BIN" | lcss-to-list --min-common 2 | filter-by-length --min 3)"
-#
-#regexp=
-#
-#while read sub; do
-#    if [ -z "$regexp" ]; then
-#        regexp="$sub"
-#    else
-#        regexp="$regexp|$sub"
-#    fi
-#done <<< "$rep_in_lcss"
-#
-#echo "repetitions in substrings:"
-#grep -E --color=always "$regexp" <<< "$lcss_list"
-#echo "==="
-#
-#short_lcss="$(echo "$lcss_list" | filter-by-length --min 3 --max 100)"
-#
 
 #
 # Match lcss in norm_strings witch coloring
