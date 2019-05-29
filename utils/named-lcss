@@ -1,0 +1,30 @@
+#!/bin/bash
+
+if [ ! -d "$1" ]; then
+    echo "$(basename $0) /path/to/fasta/dir"
+    exit 1
+fi
+
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/mk-env" --make
+
+fasta_dir="$1"
+
+seq_with_names="$(normalize-fasta "$fasta_dir" --keep-names)"
+
+while read record_lst; do
+    idx=0
+    record_count=
+
+    for record in $record_lst; do
+        if [ "$idx" -eq 0 ]; then
+            record_count="$record"
+        else
+            echo "$record_count $record"
+            echo "$seq_with_names" | grep "$record" | awk -F '#' '{ print $1 }'
+            echo
+        fi
+
+        idx="$((idx + 1))"
+    done
+
+done <<< "$(normalize-fasta "$fasta_dir" | "$LCSS_BIN")"

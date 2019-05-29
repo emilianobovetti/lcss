@@ -14,10 +14,10 @@ lcss_list="$(echo "$raw_lcss" | lcss-to-list --min-common 10)"
 #
 # Match lcss in norm_strings witch coloring
 #
-#ccode=1
-#regexp=
-#colors=
-#
+ccode=1
+regexp=
+colors=
+
 #while read sub; do
 #    if [ -z "$regexp" ]; then
 #        regexp="($sub)"
@@ -55,6 +55,8 @@ while read pair; do
     min_dis="$(echo "$distances" | head -n 1)"
     max_dis="$(echo "$distances" | tail -n 1)"
 
+    dist_diff="$(( min_dis - max_dis ))"
+
     if [ "$match_count" -gt 1 ] && [ "$max_dis" -lt 1500 ]; then
         reg1="$(echo "$norm_strings" | sub-pair-to-regex $pair)"
         reg2="$(echo "$norm_strings" | sub-pair-to-regex --invert $pair)"
@@ -72,6 +74,6 @@ while read pair; do
         echo "in $match_count strings [$min_dis, $max_dis]: $regexp"
         echo
     fi
-done <<< "$(echo "$raw_lcss" | lcss-to-list --min-common 35 | mk-pairs)"
+done <<< "$(echo "$raw_lcss" | lcss-to-list --min-common 44 | mk-pairs)"
 
 echo "==="

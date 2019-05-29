@@ -1,13 +1,44 @@
 #!/bin/bash
 
-if [ ! -d "$1" ]; then
+out_file=
+fasta_dir=
+keep_names=false
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -k|--keep-names)
+            keep_names=true
+            ;;
+        *)
+            if [ -z "$fasta_dir" ]; then
+                fasta_dir="$1"
+            elif [ -z "$out_file" ]; then
+                out_file="$1"
+            else
+                echo "unknown argument '$1' in $(basename "$0")" 1>&2
+                exit 1
+            fi
+            ;;
+    esac
+
+    shift
+done
+
+out_file="${out_file:-/dev/stdout}"
+
+if [ ! -d "$fasta_dir" ]; then
     echo "$(basename $0) /path/to/fasta/dir [out_file]"
     exit 1
 fi
 
-out="${2:-/dev/stdout}"
 
-for file in "$1"/*; do
-    sed '1d' "$file" | tr -d [:space:] >> "$out"
-    printf "\n" >> "$out"
+
+for fasta_file in "$fasta_dir"/*; do
+    if "$keep_names"; then
+        sed '1 s/$/ # /' "$fasta_file" | tr -d "\r\n" >> "$out_file"
+    else
+        sed '1d' "$fasta_file" | tr -d "\r\n" >> "$out_file"
+    fi
+
+    echo >> "$out_file"
 done
