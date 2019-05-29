@@ -89,7 +89,7 @@ while read pair; do
     min_dis="$(echo "$distances" | head -n 1)"
     max_dis="$(echo "$distances" | tail -n 1)"
 
-    if [ "$match_count" -gt 0 ]; then
+    if [ "$match_count" -gt 1 ] && [ "$min_dis" -lt 2000 ] && ; then
         reg1="$(echo "$norm_strings" | sub-pair-to-regex $pair)"
         reg2="$(echo "$norm_strings" | sub-pair-to-regex --invert $pair)"
 
