@@ -2,9 +2,44 @@
 
 . "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/mk-env" --
 
-if [ -z "$1" ] || [ -z "$2" ]; then
-    echo "$(basename $0) sub1 sub2 [path/to/norm_strings]"
+sub1=
+sub2=
+norm_file=
+invert=false
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -i|--inv|--invert)
+            invert=true
+            ;;
+        *)
+            if [ -z "$sub1" ]; then
+                sub1="$1"
+            elif [ -z "$sub2" ]; then
+                sub2="$1"
+            elif [ -z "$norm_file" ]; then
+                norm_file="$1"
+            else
+                echo "unknown argument '$1' in $(basename "$0")" 1>&2
+                exit 1
+            fi
+            ;;
+    esac
+
+    shift
+done
+
+norm_file="${norm_file:-/dev/stdin}"
+
+if [ ! -e "$norm_file" ]; then
+    echo "invalid input file '$norm_file' in $(basename "$0")" 1>&2
     exit 1
 fi
 
-grep -o "$1.*$2" | regex-compiler
+if "$invert"; then
+    tmp="$sub1"
+    sub1="$sub2"
+    sub2="$tmp"
+fi
+
+grep -o "$sub1.*$sub2" < "$norm_file" | regex-compiler

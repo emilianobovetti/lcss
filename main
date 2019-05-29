@@ -90,7 +90,21 @@ while read pair; do
     max_dis="$(echo "$distances" | tail -n 1)"
 
     if [ "$match_count" -gt 0 ]; then
-        echo "in $match_count strings [$min_dis, $max_dis]: $pair"
+        reg1="$(echo "$norm_strings" | sub-pair-to-regex $pair)"
+        reg2="$(echo "$norm_strings" | sub-pair-to-regex --invert $pair)"
+
+        if [ -z "$reg1" ]; then
+            regexp="$reg2"
+        elif [ -z "$reg2" ]; then
+            regexp="$reg1"
+        elif [ "$(echo "$reg1" | wc -m)" -lt "$(echo "$reg2" | wc -m)" ]; then
+            regexp="$reg1"
+        else
+            regexp="$reg2"
+        fi
+
+        echo "in $match_count strings [$min_dis, $max_dis]: $regexp"
+        echo
     fi
 done <<< "$(echo "$raw_lcss" | lcss-to-list --min-common 25 | mk-pairs)"
 
