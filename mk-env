@@ -22,7 +22,7 @@ fi
 if [ "$(echo "$PATH" | grep -c "$UTILS_DIR")" -lt 1 ]; then
     chmod u+x "$UTILS_DIR"/*
 
-    export PATH="$PATH:$UTILS_DIR"
+    PATH="$PATH:$UTILS_DIR"
 fi
 
 if [ ! -d "$DUMP_DIR" ]; then
