@@ -262,48 +262,6 @@ node_t *lca(node_t *n1, node_t *n2)
     }
 }
 
-node_t *get_max(node_t *n1, node_t *n2)
-{
-    if (n1->uniq_str_count > n2->uniq_str_count)
-    {
-        return n1;
-    }
-
-    if (n2->uniq_str_count > n1->uniq_str_count)
-    {
-        return n2;
-    }
-
-    if (n1->depth > n2->depth)
-    {
-        return n1;
-    }
-
-    return n2;
-}
-
-node_t *node_lcs(node_t *node)
-{
-    node_t *max = node;
-
-    if (node->next_sibling != NULL)
-    {
-        max = get_max(node, node_lcs(node->next_sibling));
-    }
-
-    if (node->first_child != NULL)
-    {
-        max = get_max(node, node_lcs(node->first_child));
-    }
-
-    return max;
-}
-
-node_t *get_lcs(tree_t *tree)
-{
-    return node_lcs(tree->root);
-}
-
 void fill_lcss(tree_t *tree, node_t *node, lcss_array_list_t **lcss)
 {
     if (node == NULL)
