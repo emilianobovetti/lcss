@@ -12,6 +12,8 @@ node_t *new_node(int left, int right)
     n->lca_count = 0;
     n->uniq_str_count = 0;
 
+    n->melting_point = 0;
+
     n->left_label = left;
     n->right_label = right;
 
@@ -32,6 +34,8 @@ node_t *new_leaf(int left)
     n->num_leaves = 0;
     n->lca_count = 0;
     n->uniq_str_count = 0;
+
+    n->melting_point = 0;
 
     n->left_label = left;
     // open transition
@@ -76,6 +80,26 @@ int get_leaf_str_idx(tree_t *tree, node_t *node)
     return - tree->str[node->right_label] - 1;
 }
 
+/*
+ * TODO: efficient implementation
+ */
+node_t *lca(node_t *n1, node_t *n2)
+{
+    if (n1 == n2)
+    {
+        return n1;
+    }
+
+    if (n1->depth > n2->depth)
+    {
+        return lca(n1->parent, n2);
+    }
+    else
+    {
+        return lca(n1, n2->parent);
+    }
+}
+
 int process_num_leaves(node_t *node)
 {
     node_t *first_child = node->first_child;
@@ -112,78 +136,6 @@ void free_children(node_t *node)
     }
 
     node->first_child = NULL;
-}
-
-void post_process_node(tree_t *tree, node_t *node)
-{
-    node->depth = node->parent->depth + LABEL_LENGTH(node);
-
-    if (node->first_child == NULL)
-    {
-        char *str = tree->str;
-
-        /*
-         * Leafs with more than one end symbol need to be trimmed:
-         *  xyz$vwp# -> xyz$
-         *
-         * The condition `i <= node->right_label` isn't necessary
-         * since the right_label on leafs is set to an arbitrary
-         * high number by default.
-         */
-        for (int i = node->left_label; true; i++)
-        {
-            if (is_end_sym(str[i]))
-            {
-                node->right_label = i;
-                break;
-            }
-        }
-
-        node_t** leafs = tree->str_idx_to_leaf_list[get_leaf_str_idx(tree, node)];
-        size_t cur_idx = (size_t) leafs[0];
-
-        leafs[cur_idx++] = node;
-        leafs[0] = (node_t*) cur_idx;
-    }
-    else
-    {
-        post_process_node(tree, node->first_child);
-    }
-
-    if (node->next_sibling != NULL)
-    {
-        post_process_node(tree, node->next_sibling);
-    }
-}
-
-void post_process_tree(tree_t *tree)
-{
-    process_num_leaves(tree->root);
-
-    tree->str_idx_to_leaf_list = calloc(tree->num_strings, sizeof(node_t**));
-
-    for (size_t i = 0; i < tree->num_strings; i++)
-    {
-        tree->str_idx_to_leaf_list[i] = calloc(tree->root->num_leaves + 1, sizeof(node_t*));
-        tree->str_idx_to_leaf_list[i][0] = (node_t*) 1; // current index
-    }
-
-    post_process_node(tree, tree->root);
-}
-
-void process_leaves_pair(tree_t *tree)
-{
-    for (size_t i = 0; i < tree->num_strings; i++)
-    {
-        node_t** leafs = tree->str_idx_to_leaf_list[i];
-        size_t cur_idx = (size_t) leafs[0];
-
-        for (size_t j = 1; j + 1 < cur_idx; j++)
-        {
-            node_t *n = lca(leafs[j]->parent, leafs[j + 1]->parent);
-            n->lca_count++;
-        }
-    }
 }
 
 int process_corr_fac(node_t *node)
@@ -242,27 +194,81 @@ void compute_uniq_str_count(tree_t *tree)
     fill_str_count_to_max_depth(tree, tree->root);
 }
 
-/*
- * TODO: efficient implementation
- */
-node_t *lca(node_t *n1, node_t *n2)
+void process_leaves_pair(tree_t *tree)
 {
-    if (n1 == n2)
+    for (size_t i = 0; i < tree->num_strings; i++)
     {
-        return n1;
-    }
+        node_t** leafs = tree->str_idx_to_leaf_list[i];
+        size_t cur_idx = (size_t) leafs[0];
 
-    if (n1->depth > n2->depth)
-    {
-        return lca(n1->parent, n2);
-    }
-    else
-    {
-        return lca(n1, n2->parent);
+        for (size_t j = 1; j + 1 < cur_idx; j++)
+        {
+            node_t *n = lca(leafs[j]->parent, leafs[j + 1]->parent);
+            n->lca_count++;
+        }
     }
 }
 
-void fill_lcss(tree_t *tree, node_t *node, lcss_array_list_t **lcss)
+void post_process_node(tree_t *tree, node_t *node)
+{
+    node->depth = node->parent->depth + LABEL_LENGTH(node);
+
+    if (node->first_child == NULL)
+    {
+        char *str = tree->str;
+
+        /*
+         * Leafs with more than one end symbol need to be trimmed:
+         *  xyz$vwp# -> xyz$
+         *
+         * The condition `i <= node->right_label` isn't necessary
+         * since the right_label on leafs is set to an arbitrary
+         * high number by default.
+         */
+        for (int i = node->left_label; true; i++)
+        {
+            if (is_end_sym(str[i]))
+            {
+                node->right_label = i;
+                break;
+            }
+        }
+
+        node_t** leafs = tree->str_idx_to_leaf_list[get_leaf_str_idx(tree, node)];
+        size_t cur_idx = (size_t) leafs[0];
+
+        leafs[cur_idx++] = node;
+        leafs[0] = (node_t*) cur_idx;
+    }
+    else
+    {
+        post_process_node(tree, node->first_child);
+    }
+
+    if (node->next_sibling != NULL)
+    {
+        post_process_node(tree, node->next_sibling);
+    }
+}
+
+void post_process_tree(tree_t *tree)
+{
+    process_num_leaves(tree->root);
+
+    tree->str_idx_to_leaf_list = calloc(tree->num_strings, sizeof(node_t**));
+
+    for (size_t i = 0; i < tree->num_strings; i++)
+    {
+        tree->str_idx_to_leaf_list[i] = calloc(tree->root->num_leaves + 1, sizeof(node_t*));
+        tree->str_idx_to_leaf_list[i][0] = (node_t*) 1; // current index
+    }
+
+    post_process_node(tree, tree->root);
+    process_leaves_pair(tree);
+    compute_uniq_str_count(tree);
+}
+
+void fill_lcss(tree_t *tree, int range, node_list_t **arr_lst, node_t *node)
 {
     if (node == NULL)
     {
@@ -271,34 +277,121 @@ void fill_lcss(tree_t *tree, node_t *node, lcss_array_list_t **lcss)
 
     int max_depth = tree->str_count_to_max_depth[node->uniq_str_count];
 
-    if (node->depth == max_depth)
+    if (abs(max_depth - node->depth) <= range)
     {
-        lcss_array_list_t *new_lcs = malloc(sizeof(lcss_array_list_t));
+        node_list_t *new_node = malloc(sizeof(node_list_t));
 
-        new_lcs->current = node;
-        new_lcs->next = lcss[node->uniq_str_count];
+        new_node->current = node;
+        new_node->next = arr_lst[node->uniq_str_count];
 
-        lcss[node->uniq_str_count] = new_lcs;
+        arr_lst[node->uniq_str_count] = new_node;
     }
 
-    fill_lcss(tree, node->next_sibling, lcss);
-    fill_lcss(tree, node->first_child, lcss);
+    fill_lcss(tree, range, arr_lst, node->next_sibling);
+    fill_lcss(tree, range, arr_lst, node->first_child);
 }
 
-lcss_array_list_t **get_lcss(tree_t *tree)
+node_list_t **get_lcss(tree_t *tree, int range)
 {
-    lcss_array_list_t **lcss = calloc(tree->num_strings + 1, sizeof(lcss_array_list_t *));
+    node_list_t **arr_lst = calloc(tree->num_strings + 1, sizeof(node_list_t*));
 
     for (int i = 0; i <= tree->num_strings; i++)
     {
-        lcss[i] = malloc(sizeof(lcss_array_list_t));
-        lcss[i]->current = tree->root;
-        lcss[i]->next = NULL;
+        arr_lst[i] = malloc(sizeof(node_list_t));
+        arr_lst[i]->current = tree->root;
+        arr_lst[i]->next = NULL;
     }
 
-    fill_lcss(tree, tree->root, lcss);
+    fill_lcss(tree, range, arr_lst, tree->root);
 
-    return lcss;
+    return arr_lst;
+}
+
+void set_node_melting_point(tree_t *tree, node_t *node)
+{
+    if (node == NULL)
+    {
+        return;
+    }
+
+    node->melting_point = node->parent->melting_point;
+
+    char *str = tree->str;
+
+    for (int i = node->left_label; i <= node->right_label; i++)
+    {
+        if (is_end_sym(str[i]))
+        {
+            break;
+        }
+
+        switch (str[i])
+        {
+            case 'A': case 'a':
+            case 'T': case 't':
+                node->melting_point += 2;
+                break;
+            case 'G': case 'g':
+            case 'C': case 'c':
+                node->melting_point += 4;
+                break;
+            default:
+                break;
+        }
+    }
+
+    set_node_melting_point(tree, node->first_child);
+    set_node_melting_point(tree, node->next_sibling);
+}
+
+void set_melting_points(tree_t *tree)
+{
+    node_t *cur_child = tree->root->first_child;
+
+    while (cur_child != NULL)
+    {
+        set_node_melting_point(tree, cur_child);
+        cur_child = cur_child->next_sibling;
+    }
+}
+
+void fill_mps(tree_t *tree, int melting_point, int range, node_list_t **arr_lst, node_t *node)
+{
+    if (node == NULL)
+    {
+        return;
+    }
+
+    if (abs(node->melting_point - melting_point) <= range)
+    {
+        node_list_t *new_node = malloc(sizeof(node_list_t));
+
+        new_node->current = node;
+        new_node->next = arr_lst[node->uniq_str_count];
+
+        arr_lst[node->uniq_str_count] = new_node;
+    }
+
+    fill_mps(tree, melting_point, range, arr_lst, node->next_sibling);
+    fill_mps(tree, melting_point, range, arr_lst, node->first_child);
+}
+
+node_list_t **get_commons_by_melting_point(tree_t *tree, int melting_point, int range)
+{
+    set_melting_points(tree);
+
+    node_list_t **arr_lst = calloc(tree->num_strings + 1, sizeof(node_list_t*));
+
+    for (int i = 0; i <= tree->num_strings; i++)
+    {
+        arr_lst[i] = malloc(sizeof(node_list_t));
+        arr_lst[i]->current = tree->root;
+        arr_lst[i]->next = NULL;
+    }
+
+    fill_mps(tree, melting_point, range, arr_lst, tree->root);
+
+    return arr_lst;
 }
 
 int label_cpy(node_t *node, char *str, char* out, int idx)

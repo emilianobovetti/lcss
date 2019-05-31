@@ -14,30 +14,21 @@ typedef struct joined_strs
 }
 joined_strs_t;
 
-lcss_array_list_t **build_lcss(tree_t* tree)
-{
-    post_process_tree(tree);
-    process_leaves_pair(tree);
-    compute_uniq_str_count(tree);
-
-    return get_lcss(tree);
-}
-
-void print_lcss(tree_t *tree, lcss_array_list_t **lcss)
+void print_node_arr_lst(tree_t *tree, node_list_t **arr_lst)
 {
     for (int i = 1; i <= tree->num_strings; i++)
     {
         printf("%d", i);
 
-        lcss_array_list_t *lcss_node = lcss[i];
+        node_list_t *node_lst = arr_lst[i];
 
-        while (lcss_node != NULL)
+        while (node_lst != NULL)
         {
-            char *i_lcs = node_to_string(tree, lcss_node->current);
+            char *i_lcs = node_to_string(tree, node_lst->current);
             printf(" %s", i_lcs);
             free(i_lcs);
 
-            lcss_node = lcss_node->next;
+            node_lst = node_lst->next;
         }
 
         putchar('\n');
@@ -112,11 +103,15 @@ void test_with_static_strings(void)
         NULL
     };
 
+    int range = 0;
+
     joined_strs_t *join = join_str_arr(test);
 
     tree_t *tree = build_tree(join->ptr, join->num_strings);
-    lcss_array_list_t **lcss = build_lcss(tree);
-    print_lcss(tree, lcss);
+    post_process_tree(tree);
+    node_list_t **lcss = get_lcss(tree, range);
+
+    print_node_arr_lst(tree, lcss);
 }
 
 #define STR_SEP '\n'
@@ -199,17 +194,77 @@ joined_strs_t *read_strings(FILE* fp)
     return res;
 }
 
-int main(void)
+typedef enum selection_mode
 {
+    DEPTH, MELTING_POINT
+}
+selection_mode_t;
+
+int main(int argc, char **argv)
+{
+    selection_mode_t mode = DEPTH;
+    int melting_point = 0;
+    int range = 0;
+
+    for (int i = 1; i < argc; i++)
+    {
+        char *cur_arg = argv[i];
+
+        if (strcmp("-m", cur_arg) == 0 || strcmp("--melting-point", cur_arg) == 0)
+        {
+            mode = MELTING_POINT;
+            i++;
+
+            if (i == argc)
+            {
+                fprintf(stderr, "please specify a melting point\n");
+                return 1;
+            }
+
+            melting_point = strtol(argv[i], NULL, 10);
+        }
+        else if (strcmp("-r", cur_arg) == 0 || strcmp("--range", cur_arg) == 0)
+        {
+            i++;
+
+            if (i == argc)
+            {
+                fprintf(stderr, "please specify a range\n");
+                return 1;
+            }
+
+            range = strtol(argv[i], NULL, 10);
+        }
+        else
+        {
+            fprintf(stderr, "unrecognized argument '%s' in %s\n", cur_arg, argv[0]);
+            return 1;
+        }
+    }
+
     joined_strs_t *join = read_strings(stdin);
 
     if (join == NULL)
     {
-        fprintf(stderr, "Error in read_strings\n");
+        fprintf(stderr, "error in read_strings\n");
         return 1;
     }
 
     tree_t *tree = build_tree(join->ptr, join->num_strings);
-    lcss_array_list_t **lcss = build_lcss(tree);
-    print_lcss(tree, lcss);
+    post_process_tree(tree);
+
+    node_list_t **res_arr_lst;
+
+    switch (mode)
+    {
+        case DEPTH:
+            res_arr_lst = get_lcss(tree, range);
+            break;
+        case MELTING_POINT:
+            res_arr_lst = get_commons_by_melting_point(tree, melting_point, range);
+            break;
+    }
+    if (MELTING_POINT)
+
+    print_node_arr_lst(tree, res_arr_lst);
 }

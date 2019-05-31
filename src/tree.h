@@ -15,6 +15,8 @@ typedef struct node
     int lca_count;
     int uniq_str_count;
 
+    int melting_point;
+
     struct node *parent;
     struct node *suffix_link;
 
@@ -49,13 +51,13 @@ typedef struct tree
 }
 tree_t;
 
-typedef struct lcss_array_list
+typedef struct node_list
 {
     struct node *current;
 
-    struct lcss_array_list *next;
+    struct node_list *next;
 }
-lcss_array_list_t;
+node_list_t;
 
 node_t *new_node(int left, int right);
 
@@ -67,17 +69,11 @@ int get_leaf_str_idx(tree_t *tree, node_t *node);
 
 void post_process_tree(tree_t *tree);
 
-void process_leaves_pair(tree_t *tree);
-
-void compute_uniq_str_count(tree_t *tree);
-
 bool is_end_sym(char c);
 
-node_t *lca(node_t *n1, node_t *n2);
+node_list_t **get_lcss(tree_t *tree, int range);
 
-node_t *get_lcs(tree_t *tree);
-
-lcss_array_list_t **get_lcss(tree_t *tree);
+node_list_t **get_commons_by_melting_point(tree_t *tree, int melting_point, int range);
 
 char *node_to_string(tree_t *tree, node_t *n);
 
