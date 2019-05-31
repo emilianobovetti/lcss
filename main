@@ -9,7 +9,7 @@ fi
 
 norm_strings="$(normalize-fasta "$1")"
 raw_lcss="$(echo "$norm_strings" | "$LCSS_BIN")"
-lcss_list="$(echo "$raw_lcss" | lcss-to-list --min-common 10)"
+lcss_list="$(echo "$raw_lcss" | res-to-list --min-common 10)"
 
 #
 # Match lcss in norm_strings witch coloring
@@ -74,6 +74,6 @@ while read pair; do
         echo "in $match_count strings [$min_dis, $max_dis]: $regexp"
         echo
     fi
-done <<< "$(echo "$raw_lcss" | lcss-to-list --min-common 44 | mk-pairs)"
+done <<< "$(echo "$raw_lcss" | res-to-list --min-common 44 | mk-pairs)"
 
 echo "==="

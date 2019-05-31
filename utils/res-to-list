@@ -29,8 +29,8 @@ if ! is-int "$min_common"; then
     exit 1
 fi
 
-while read record; do
-    set $record
+while read record_lst; do
+    set $record_lst
     str_count="$1"
 
     if [ "$str_count" -ge "$min_common" ]; then
