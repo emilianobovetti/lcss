@@ -2,7 +2,7 @@
 
 . "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/mk-env" --make
 
-"$LCSS_BIN" -m 2 <<EOF
+"$LCSS_BIN" <<EOF
 asdasd
 asdasd
 asddasd
