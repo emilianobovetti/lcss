@@ -196,13 +196,13 @@ joined_strs_t *read_strings(FILE* fp)
 
 typedef enum selection_mode
 {
-    DEPTH, MELTING_POINT
+    LENGTH, MELTING_POINT
 }
 selection_mode_t;
 
 int main(int argc, char **argv)
 {
-    selection_mode_t mode = DEPTH;
+    selection_mode_t mode = LENGTH;
     int melting_point = 0;
     int range = 0;
 
@@ -257,14 +257,13 @@ int main(int argc, char **argv)
 
     switch (mode)
     {
-        case DEPTH:
+        case LENGTH:
             res_arr_lst = get_lcss(tree, range);
             break;
         case MELTING_POINT:
             res_arr_lst = get_commons_by_melting_point(tree, melting_point, range);
             break;
     }
-    if (MELTING_POINT)
 
     print_node_arr_lst(tree, res_arr_lst);
 }
