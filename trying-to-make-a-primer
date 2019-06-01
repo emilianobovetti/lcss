@@ -19,23 +19,23 @@ aagcagtagacgaaatcgaatc
 
 # 1.1 gcgaaacagcagaagtgagg
 ./utils/normalize-fasta ../sequenze |
-                          primer with desired melting point
-  adjust to find match all strings  |
-                   v                v
+#                         primer with desired melting point
+#       min to match 48/48 strings  |
+#                  v                v
 tre-agrep --color -6 gcgaaacagcagaagtgagg |
 grep -o $'\E\\[01;31m.*\E\\[00m' |
 sort | uniq
 
 result
 ------
-gcgaaacagcagaagtgagg    36
+gcgaaacagcagaagtgagg    37
 gcgcaaaagcagaatgagc     5
-actaaacagcatggacaggagg
-gcgatactgctgaaggagg
-gcgattcgcaggagtgagc
-gcgcacacagaagagggg
-gtgaaaccgatacgtgaga
-gtgaagcagaagaagagg
+actaaacagcatggacaggagg  1
+gcgatactgctgaaggagg     1
+gcgattcgcaggagtgagc     1
+gcgcacacagaagagggg      1
+gtgaaaccgatacgtgaga     2
+gtgaagcagaagaagagg      2
 
 # 2.1
 keep gcgaaacagcagaagtgagg (found in 36 strings)
@@ -44,7 +44,28 @@ and  gcgcaaaagcagaatgagc (found in 5)
 gcgaaacagcagaagtgagg
 gcgcaaaagcagaa-tgagc
 
+# d = 16
 gcg[ac]aa[ac]agcagaag?tgag[cg] # 42
+
+gcgaaaaagcagaatgagc     56
+gcgaaaaagcagaatgagg     56
+gcgaaacagcagaatgagc     58
+gcgaaacagcagaatgagg     58
+gcgcaaaagcagaatgagc     58
+gcgcaaaagcagaatgagg     58
+gcgaaaaagcagaagtgagc    60
+gcgaaaaagcagaagtgagg    60
+gcgcaacagcagaatgagc     60
+gcgcaacagcagaatgagg     60
+gcgaaacagcagaagtgagc    62
+gcgaaacagcagaagtgagg    62
+gcgcaaaagcagaagtgagc    62
+gcgcaaaagcagaagtgagg    62
+gcgcaacagcagaagtgagc    64
+gcgcaacagcagaagtgagg    64
+
+# d = 2048
+g[ct]g[ac]a[ag][ac][ac]g[ac]a?[gt]a[ac]g?t?gag # 45
 
 ============================================================
 
@@ -53,7 +74,9 @@ gcg[ac]aa[ac]agcagaag?tgag[cg] # 42
 ./utils/normalize-fasta ../sequenze | tre-agrep -5 -c gcagtagacgaaatcgaatc # 45
 ./utils/normalize-fasta ../sequenze | tre-agrep -6 -c gcagtagacgaaatcgaatc # 48
 
-./utils/normalize-fasta ../sequenze | tre-agrep --color -6 gcagtagacgaaatcgaatc | grep -o $'\E\\[01;31m.*\E\\[00m' | sort | uniq
+./utils/normalize-fasta ../sequenze |
+tre-agrep --color -6 gcagtagacgaaatcgaatc |
+grep -o $'\E\\[01;31m.*\E\\[00m' | sort | uniq
 
 ./utils/normalize-fasta ../sequenze | grep -c gcagtagacgaaatcgaatc # 37
 
