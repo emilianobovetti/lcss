@@ -1,0 +1,23 @@
+1.
+
+tre-agrep --color -6 gcgaaacagcagaagtgagg sequenze-norm |
+grep -o $'\E\\[01;31m.*\E\\[00m' |
+sort | uniq
+
+actaaacagcatggacaggagg
+gcgaaacagcagaagtgagg
+gcgatactgctgaaggagg
+gcgattcgcaggagtgagc
+gcgcaaaagcagaatgagc
+gcgcacacagaagagggg
+gtgaaaccgatacgtgaga
+gtgaagcagaagaagagg
+
+2.
+keep gcgaaacagcagaagtgagg (found in 36 strings)
+and  gcgcaaaagcagaatgagc (found in 5)
+
+gcgaaacagcagaagtgagg
+gcgcaaaagcagaa-tgagc
+
+gcg[ac]aa[ac]agcagaag?tgag[cg]
