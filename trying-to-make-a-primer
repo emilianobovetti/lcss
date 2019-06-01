@@ -18,6 +18,8 @@ aagcagtagacgaaatcgaatc
 ============================================================
 ============================================================
 
+1. gcgaaacagcagaagtgagg
+
 ./utils/normalize-fasta ../sequenze |
 tre-agrep --color -6 -D 9 -I 9 -S 1 gcgaaacagcagaagtgagg |
 grep -o $'\E\\[01;31m.*\E\\[00m' | sort | uniq
@@ -47,6 +49,29 @@ gcgatacgacggaagtgata
 
 # d = 2304
 gcga[agt]ac[ag][ag]c[ag][gt][at]a[gt]tg[at][cgt][ag] # 39
+
+============================================================
+
+2. gcagtagacgaaatcgaatc
+
+./utils/normalize-fasta ../sequenze |
+tre-agrep --color -6 -D 9 -I 9 -S 1 gcagtagacgaaatcgaatc |
+grep -o $'\E\\[01;31m.*\E\\[00m' | sort | uniq |
+./utils/regex-compiler
+
+# d = 3072
+gc[at][ag][ct]a[ag]a[ct][gt]aaa[ct][ac][gt][ac]at[cgt] # 39
+
+============================================================
+
+3. ggaaatctcgttccgtatcg
+
+# d = 64
+[cg]gaaatc[at][ct]gttc[ct]g[gt][at]tcg # 38
+# d = 1536
+[cg][ag]aaa[gt]c[at][cgt][gt][ct]tc[ct]g[gt][at]tcg # 39
+# d = 27648
+[cg][ag]aa[at][gt]c[act][cgt][gt][act]t[ct][ct]g[gt][at][at]cg # 41
 
 ============================================================
 ============================================================
