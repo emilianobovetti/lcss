@@ -1,23 +1,202 @@
-1.
+# 0
+find primer with desired melting point
 
-tre-agrep --color -6 gcgaaacagcagaagtgagg sequenze-norm |
+./utils/normalize-fasta ../sequenze |
+./build/lcss --melting-point 60 --range 2 |
+./utils/res-to-list --min-common 37
+
+result
+------
+gcgaaacagcagaagtgagg
+gcagtagacgaaatcgaatc
+ggaaatctcgttccgtatcg
+ccccgcagttactggattaa
+cgaaacagcagaagtgagg
+agcagtagacgaaatcgaatc
+aagcagtagacgaaatcgaatc
+
+============================================================
+
+# 1.1 gcgaaacagcagaagtgagg
+./utils/normalize-fasta ../sequenze |
+                          primer with desired melting point
+  adjust to find match all strings  |
+                   v                v
+tre-agrep --color -6 gcgaaacagcagaagtgagg |
 grep -o $'\E\\[01;31m.*\E\\[00m' |
 sort | uniq
 
+result
+------
+gcgaaacagcagaagtgagg    36
+gcgcaaaagcagaatgagc     5
 actaaacagcatggacaggagg
-gcgaaacagcagaagtgagg
 gcgatactgctgaaggagg
 gcgattcgcaggagtgagc
-gcgcaaaagcagaatgagc
 gcgcacacagaagagggg
 gtgaaaccgatacgtgaga
 gtgaagcagaagaagagg
 
-2.
+# 2.1
 keep gcgaaacagcagaagtgagg (found in 36 strings)
 and  gcgcaaaagcagaatgagc (found in 5)
 
 gcgaaacagcagaagtgagg
 gcgcaaaagcagaa-tgagc
 
-gcg[ac]aa[ac]agcagaag?tgag[cg]
+gcg[ac]aa[ac]agcagaag?tgag[cg] # 42
+
+============================================================
+
+# 1.2 gcagtagacgaaatcgaatc
+
+./utils/normalize-fasta ../sequenze | tre-agrep -5 -c gcagtagacgaaatcgaatc # 45
+./utils/normalize-fasta ../sequenze | tre-agrep -6 -c gcagtagacgaaatcgaatc # 48
+
+./utils/normalize-fasta ../sequenze | tre-agrep --color -6 gcagtagacgaaatcgaatc | grep -o $'\E\\[01;31m.*\E\\[00m' | sort | uniq
+
+./utils/normalize-fasta ../sequenze | grep -c gcagtagacgaaatcgaatc # 37
+
+result
+------
+gcagtagacgaaatcgaatc    37
+gcagtaatgaaagccatc      18
+
+gagcagacagcaatgaatg     2
+gcagagacaatgaaac        2
+gcaggcgacgatattaatc     1
+gcagtggaaagcgcacc       1
+gcagttgcgaataatc        1
+gcagtttgatgaaatcaata    1
+gcatagctgaaatcaacatc    2
+gcattcggaatcaatc        1
+gcgtaaacgaatagcatc      1
+tcagcagagaaagcggatc     1
+
+# 2.2
+keep gcagtagacgaaatcgaatc and gcagtaatgaaagccatc
+
+gcagtagacgaaatcgaatc
+gcagta-atgaaagcc-atc
+
+printf "gcagtagacgaaatcgaatc\ngcagta-atgaaagcc-atc" | ./utils/regex-compiler
+
+gcagta[-g]a[ct]gaaa[gt]c[cg][-a]atc
+
+gcagtag?a[ct]gaaa[gt]c[cg]a?atc
+
+./utils/normalize-fasta sequenze | grep -E -c "gcagtag?a[ct]gaaa[gt]c[cg]a?atc" # 38
+
+============================================================
+
+# 1.3 ggaaatctcgttccgtatcg
+
+ggaaatctcgttccgtatcg    37
+ataaattcgtgcgtatcg      1
+ggaaacgtctttcctgtagtcc  1
+ggaaatccgatgctttcg      1
+ggaaatgctcgatggtgtg     1
+ggaaatgttattcctacg      1
+ggaaatgtttttcctgttg     2
+ggaagtcatcgaacagatcg    2
+ggacattcgtcctacg        23
+ggataatctggttctgccatcg  1
+ggatgatctcttcatcg       1
+
+# 2.3
+ggaaatctcgttccgtatcg
+ggacatt-cgt-cc-ta-cg
+--------------------
+gga[ac]at[ct]t?cgtt?ccg?tat?cg # 38
+
+============================================================
+
+# 1.4 ccccgcagttactggattaa
+
+accagcagttgcgaataa      1
+cacctctgttacggtaattaa   1
+ccccgcagttactggattaa    37
+ccccggtgattactgatac     2
+cccttcagacgtattaa       2
+ccgcgcagatacagcaataa    2
+ctccgcagacctgtattgaa    1
+ctccggttgccggatcaa      1
+tccggcatgtacaggattca    2
+
+# 2.4
+ccccgcag-ttactggattaa
+ccccggtgattactg-at-ac
+
+ccccg[cg][at]ga?ttactgg?att?a[ac] # 39
+
+============================================================
+
+# 1.5 cgaaacagcagaagtgagg
+                                                note the distance
+                                                         v
+./utils/normalize-fasta ../sequenze | tre-agrep --color -5 -c cgaaacagcagaagtgagg # 48
+
+cgaaaacagcagttaatgagg   1
+cgaaacagcagaagtgagg     37
+cgaaccggccagacggagg     2
+cgatactgctgaaggagg      1
+cgattcgcaggagtgagc      1
+cgcaaaagcagaatgagc      5
+cgcacacagaagagggg       1
+cgtgaagcagaagaagagg     2
+ctaaacagcatggacaggagg   1
+
+# 2.5
+cgaaacagcagaagtgagg
+cgcaaaagcagaa-tgagc
+
+cg[ac]aa[ac]agcagaag?tgag[cg] # 42
+
+============================================================
+
+# 1.6 agcagtagacgaaatcgaatc
+
+agcagacagcaatgaatg      2
+agcagagacaatgaaac       2
+agcaggcgacgatattaatc    1
+agcagtagacgaaatcgaatc   37
+agcagttgcgaataatc       1
+agcagtttgatgaaatcaata   1
+agcgtaccgaaaacgac       1
+agcgttgcaaatgatc        1
+atcgtcgacaaaatcgagtatc  4
+ctcagcagagaaagcggatc    1
+
+# 2.6
+agcagtagacgaaatcgaatc??
+ atcgtcgacaaaatcgagtatc
+
+find the last two char (??)
+
+./utils/normalize-fasta ../sequenze | grep -o "agcagtagacgaaatcgaatc.." | sort | uniq
+
+agcagtagacgaaatcgaatcaa
+agcagtagacgaaatcgaatcga
+ atcgtcgacaaaatcgagtatc
+
+[ag][ct][ac]gt[ac]gac[ag]aaatcga[ag]t[ac][agt][ac] # 41
+
+============================================================
+
+# 1.7 aagcagtagacgaaatcgaatc
+
+aacaggcgacgatattaatc    1
+aacagtattccataaacgaatc  3
+aagcagtagacgaaatcgaatc  37
+aaggaggaggtgaaacgcatc   1
+actcagcagagaaagcggatc   1
+aggcatagctgaaatcaacatc  2
+cagcagttgcgaataatc      1
+gagcaggcgacgatattaatc   1
+tagcagagacaatgaaac      2
+
+# 2.7
+aagcagtagacga-aatcgaatc
+aa-cagtattccataaacgaatc
+
+aag?cagta[gt][at]c[cg]at?aa[at]cgaatc # 40
