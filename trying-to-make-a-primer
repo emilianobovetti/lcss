@@ -16,6 +16,33 @@ agcagtagacgaaatcgaatc
 aagcagtagacgaaatcgaatc
 
 ============================================================
+============================================================
+
+./utils/normalize-fasta ../sequenze |
+tre-agrep --color -6 -D 9 -I 9 -S 1 gcgaaacagcagaagtgagg |
+grep -o $'\E\\[01;31m.*\E\\[00m' | sort | uniq
+
+gaaaaacggcagaactgaaa
+gcgaaacagcagaagtgagg
+gcgagacagcattattgtcg
+gcgatacgacggaagtgata
+gtgaagcagaagaagaggag
+
+| ./utils/regex-compiler
+
+# d = 331776
+g[act][ag]a[agt][ag]c[ag][ag][ac][ag][gt][at]a[cgt][at]g[agt][acgt][ag] # 43
+
+gcgaaacagcagaagtgagg
+gcgagacagcattattgtcg
+gcgatacgacggaagtgata
+gtgaagcagaagaagaggag
+
+# d = 73728
+g[ct]ga[agt][ag]c[ag][ag][ac][ag][gt][at]a[gt][at]g[agt][acgt][ag] # 41
+
+============================================================
+============================================================
 
 # 1.1 gcgaaacagcagaagtgagg
 ./utils/normalize-fasta ../sequenze |
@@ -223,3 +250,4 @@ aagcagtagacga-aatcgaatc
 aa-cagtattccataaacgaatc
 
 aag?cagta[gt][at]c[cg]at?aa[at]cgaatc # 40
+
