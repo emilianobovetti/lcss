@@ -21,11 +21,11 @@ aagcagtagacgaaatcgaatc
 ./utils/mk-primer ../sequenze res_i
 
 matches: 41
-degeneracy: 1536
+degeneracy: 1_536
 g[act][ag]aa[ag]c[ag]g[ac]agaa[cg][at]g[ag][ag][ag]
 
 matches: 41
-degeneracy: 18432
+degeneracy: 18_432
 g[ac][ag]a[agt]ac[ag][ag]c[ag][gt][at]a[cgt]tg[at][acgt][ag]
 
 matches: 42
@@ -33,63 +33,63 @@ degeneracy: 64
 cc[cg]cgcag[at]tac[at]g[cg]a[at][ct]aa
 
 matches: 42
-degeneracy: 2304
+degeneracy: 2_304
 c[ct][cgt]cgca[ag][at][gt]ac[at]g[cg][ac][agt][ct]aa
 
 matches: 42
-degeneracy: 41472
+degeneracy: 41_472
 g[act][ag]a[ag][ag]c[ag]g[ac]a[gt][at]a[cgt][at]g[agt][acg][ag]
 
 matches: 43
-degeneracy: 1536
+degeneracy: 1_536
 [ct]c[cg][cg]gca[gt][agt]tac[at]g[cg]a[at][ct][ac]a
 
 matches: 43
-degeneracy: 41472
+degeneracy: 41_472
 [ct][ct][cgt][cg]gca[agt][agt][gt]ac[at]g[cg][ac][agt][ct][ac]a
 
 matches: 43
-degeneracy: 331776
+degeneracy: 331_776
 g[act][ag]a[agt][ag]c[ag][ag][ac][ag][gt][at]a[cgt][at]g[agt][acgt][ag]
 
 matches: 45
-degeneracy: 31104
+degeneracy: 31_104
 [ac][acg]aaa[ac][acg][cg]c[ac][ag][ag]a[cgt]tg[agt][agt][ag]
 
 matches: 45
-degeneracy: 139968
+degeneracy: 139_968
 [ac][acg]a[at]a[ac][acg][acg]c[acg][ag][ag]a[cgt]tg[agt][agt][ag]
 
 matches: 46
-degeneracy: 331776
+degeneracy: 331_776
 [ac][acg]aa[ag][ac][acg][cg]c[ac][ag][acg]a[acgt]t[cg][acgt][agt][ag]
 
 matches: 46
-degeneracy: 373248
+degeneracy: 373_248
 [act][acg]aa[ag][ac][acg][cg][ac][ac][ag][ag]a[cgt][at]g[agt][agt][ag]
 
 matches: 46
-degeneracy: 995328
+degeneracy: 995_328
 [ac][acg]aa[agt][ac][acg][cg]c[ac][ag][acg]a[acgt][at][cg][acgt][agt][ag]
 
 matches: 46
-degeneracy: 1492992
+degeneracy: 1_492_992
 [ac][acg]a[at][ag][ac][acg][acg]c[acg][ag][acg]a[acgt]t[cg][acgt][agt][ag]
 
 matches: 47
-degeneracy: 1990656
+degeneracy: 1_990_656
 [act][acg]aa[ag][ac][acg][cg][ac][ac][ag][acg]a[acgt][at][cg][acgt][agt][ag]
 
 matches: 47
-degeneracy: 2985984
+degeneracy: 2_985_984
 [act][acg]aa[agt][ac][acg][cg][ac][ac][ag][acg]a[acgt][at][cg][acgt][agt][ag]
 
 matches: 47
-degeneracy: 4478976
+degeneracy: 4_478_976
 [ac][acg]a[at][agt][ac][acg][acg]c[acg][ag][acg]a[acgt][at][cg][acgt][agt][ag]
 
 matches: 47
-degeneracy: 13436928
+degeneracy: 13_436_928
 [act][acg]a[at][agt][ac][acg][acg][ac][acg][ag][acg]a[acgt][at][cg][acgt][agt][ag]
 
 ============================================================
