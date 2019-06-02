@@ -359,7 +359,13 @@ void post_process_tree(tree_t *tree)
     fill_str_count_to_max_depth(tree, tree->root);
 }
 
-void fill_commons(tree_t *tree, int target_len, int range, node_list_t **arr_lst, node_t *node)
+/*
+ * Parameters: tree, target_len, range, array list of node, current node
+ *
+ * Fills the array list with all nodes that fits the
+ * given parameters.
+ */
+void fill_commons_by_length(tree_t *tree, int target_len, int range, node_list_t **arr_lst, node_t *node)
 {
     if (node == NULL)
     {
@@ -368,7 +374,7 @@ void fill_commons(tree_t *tree, int target_len, int range, node_list_t **arr_lst
 
     int target_depth = target_len;
 
-    if (target_len == INT_MAX)
+    if (target_len >= INT_MAX)
     {
         // target_len = max_depth
         target_depth = tree->str_count_to_max_depth[node->uniq_str_count];
@@ -384,10 +390,21 @@ void fill_commons(tree_t *tree, int target_len, int range, node_list_t **arr_lst
         arr_lst[node->uniq_str_count] = new_node;
     }
 
-    fill_commons(tree, target_len, range, arr_lst, node->next_sibling);
-    fill_commons(tree, target_len, range, arr_lst, node->first_child);
+    fill_commons_by_length(tree, target_len, range, arr_lst, node->next_sibling);
+    fill_commons_by_length(tree, target_len, range, arr_lst, node->first_child);
 }
 
+/*
+ * Given a tree, a target_len and a range, gives an array of lists
+ * with all nodes that fits the given length and range.
+ *
+ * If the given length is greater than or equal to INT_MAX,
+ * returns nodes with max length.
+ *
+ * The array goes from 1 to tree->num_strings:
+ * In position [i] there is a list of all substrings
+ * common to exactly 'i' strings that fits the given parameters.
+ */
 node_list_t **get_commons_by_length(tree_t *tree, int target_len, int range)
 {
     node_list_t **arr_lst = calloc(tree->num_strings + 1, sizeof(node_list_t*));
@@ -399,11 +416,15 @@ node_list_t **get_commons_by_length(tree_t *tree, int target_len, int range)
         arr_lst[i]->next = NULL;
     }
 
-    fill_commons(tree, target_len, range, arr_lst, tree->root);
+    fill_commons_by_length(tree, target_len, range, arr_lst, tree->root);
 
     return arr_lst;
 }
 
+/*
+ * Sets n->melting_point for node n, for the subtree
+ * rooted in n and for all siblings of n.
+ */
 void set_node_melting_point(tree_t *tree, node_t *node)
 {
     if (node == NULL)
@@ -441,6 +462,9 @@ void set_node_melting_point(tree_t *tree, node_t *node)
     set_node_melting_point(tree, node->next_sibling);
 }
 
+/*
+ * Sets n->melting_point for every node n.
+ */
 void set_melting_points(tree_t *tree)
 {
     node_t *cur_child = tree->root->first_child;
@@ -452,7 +476,13 @@ void set_melting_points(tree_t *tree)
     }
 }
 
-void fill_mps(tree_t *tree, int target_melt_pt, int range, node_list_t **arr_lst, node_t *node)
+/*
+ * Parameters: tree, target_melt_pt, range, array list of node, current node
+ *
+ * Fills the array list with all nodes that fits the
+ * given parameters.
+ */
+void fill_commons_by_mp(tree_t *tree, int target_melt_pt, int range, node_list_t **arr_lst, node_t *node)
 {
     if (node == NULL)
     {
@@ -469,10 +499,18 @@ void fill_mps(tree_t *tree, int target_melt_pt, int range, node_list_t **arr_lst
         arr_lst[node->uniq_str_count] = new_node;
     }
 
-    fill_mps(tree, target_melt_pt, range, arr_lst, node->next_sibling);
-    fill_mps(tree, target_melt_pt, range, arr_lst, node->first_child);
+    fill_commons_by_mp(tree, target_melt_pt, range, arr_lst, node->next_sibling);
+    fill_commons_by_mp(tree, target_melt_pt, range, arr_lst, node->first_child);
 }
 
+/*
+ * Given a tree, a target_melt_pt and a range, gives an array of lists
+ * with all nodes that fits the given melting point and range.
+ *
+ * The array goes from 1 to tree->num_strings:
+ * In position [i] there is a list of all substrings
+ * common to exactly 'i' strings that fits the given parameters.
+ */
 node_list_t **get_commons_by_melting_point(tree_t *tree, int target_melt_pt, int range)
 {
     set_melting_points(tree);
@@ -486,11 +524,19 @@ node_list_t **get_commons_by_melting_point(tree_t *tree, int target_melt_pt, int
         arr_lst[i]->next = NULL;
     }
 
-    fill_mps(tree, target_melt_pt, range, arr_lst, tree->root);
+    fill_commons_by_mp(tree, target_melt_pt, range, arr_lst, tree->root);
 
     return arr_lst;
 }
 
+/*
+ * Given node 'n', tree->str, a string buffer
+ * and buffer's current index, copies the label
+ * of the given node into the buffer, starting from
+ * given index.
+ *
+ * Returns the new current index.
+ */
 int label_cpy(node_t *node, char *str, char* out, int idx)
 {
     int left_label = node->left_label;
@@ -514,6 +560,9 @@ int label_cpy(node_t *node, char *str, char* out, int idx)
     return idx;
 }
 
+/*
+ * Given node 'n', returns the string it represents.
+ */
 char *node_to_string(tree_t *tree, node_t *node)
 {
     char *out = calloc(node->depth, 1); // sizeof(char)
