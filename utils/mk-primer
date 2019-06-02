@@ -39,7 +39,11 @@ function count_degeneracy {
         deg="$((deg * (group_len - 2)))"
     done <<< "$(echo "$1" | grep -o '\[[^]]*\]')"
 
-    echo "$deg"
+    if [ "$deg" -lt 0 ]; then
+        echo 1
+    else
+        echo "$deg"
+    fi
 }
 
 function print_primer {
@@ -50,4 +54,20 @@ function print_primer {
     echo "$primer"
 }
 
-echo "$norm_str" | fuzzy_search "$primer_seed" | regex-compiler | print_primer
+seeds="$(echo "$norm_str" | fuzzy_search "$primer_seed")"
+done_primers=
+
+while read s1; do
+    seed_list="$s1"
+
+    while read s2; do
+        seed_list="$(printf "%s\n%s" "$seed_list" "$s2")"
+        current_primer="$(echo "$seed_list" | regex-compiler)"
+
+        if [ "$(echo "$done_primers" | grep -Fc "$current_primer")" -eq 0 ]; then
+            done_primers="$(printf "%s\n%s" "$current_primer" "$done_primers")"
+            echo "$current_primer" | print_primer
+            echo "========="
+        fi
+    done <<< "$(grep -v "$s1" <<< "$seeds")"
+done <<< "$seeds"
