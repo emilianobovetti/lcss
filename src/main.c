@@ -24,9 +24,9 @@ void print_node_arr_lst(tree_t *tree, node_list_t **arr_lst)
 
         while (node_lst != NULL)
         {
-            char *i_lcs = node_to_string(tree, node_lst->current);
-            printf(" %s", i_lcs);
-            free(i_lcs);
+            char *i_str = node_to_string(tree, node_lst->current);
+            printf(" %s", i_str);
+            free(i_str);
 
             node_lst = node_lst->next;
         }
@@ -35,6 +35,9 @@ void print_node_arr_lst(tree_t *tree, node_list_t **arr_lst)
     }
 }
 
+/*
+ * Checks if a character is an end symbol.
+ */
 bool check_end_sym(char end_sym)
 {
     bool check = is_end_sym(end_sym);
@@ -42,12 +45,15 @@ bool check_end_sym(char end_sym)
     if (!check)
     {
         fprintf(stderr, "Too many strings\n");
-        fprintf(stderr, "I can't handle more than %d strings :(\n", UCHAR_MAX - SCHAR_MAX - 1);
+        fprintf(stderr, "Can't handle more than %d strings\n", UCHAR_MAX - SCHAR_MAX - 1);
     }
 
     return check;
 }
 
+/*
+ * This function is here for testing purpose, not actually used.
+ */
 joined_strs_t *join_str_arr(char **strings)
 {
     size_t total_len = 1; // +1 for '\0'
@@ -84,7 +90,6 @@ joined_strs_t *join_str_arr(char **strings)
         }
     }
 
-    // don't forget to bring a towel
     cat[cat_idx] = '\0';
 
     joined_strs_t *res = malloc(sizeof(joined_strs_t));
@@ -94,6 +99,9 @@ joined_strs_t *join_str_arr(char **strings)
     return res;
 }
 
+/*
+ * This function is here for testing purpose, not actually used.
+ */
 void test_with_static_strings(void)
 {
     char *test[] = {
@@ -117,11 +125,37 @@ void test_with_static_strings(void)
 #define STR_SEP '\n'
 #define BASE_SIZE 1024
 
+/*
+ * Reads strings from a file.
+ * Every string is terminated by STR_SEP.
+ * Copies the strings in the heap, adds end symbols.
+ * Returns a pointer to the resulting string
+ * and the number of the total strings.
+ */
 joined_strs_t *read_strings(FILE* fp)
 {
     size_t cur_size = BASE_SIZE;
     size_t num_strings = 1;
     size_t len = 0;
+
+    /*
+     * The way end symbols are choosen sets a limit of max 127
+     * input strings.
+     * This is due to a naive implementation of generalized
+     * suffix tree.
+     *
+     * Anyway don't just change this number, you could break
+     * 'get_leaf_str_idx' function.
+     * That function must guarantee that every string has a
+     * unique index that goes from 0 to num_strings.
+     *
+     * So the way in which those symbols are assigned is
+     * tightly coupled to 'get_leaf_str_idx'.
+     *
+     * This looks like a bad idea, but if you need to
+     * process more than 127 strings it's likely you'll need
+     * a better approach to generalized suffix tree anyway.
+     */
     char end_sym = UCHAR_MAX;
     char cur_c = '\0', last_c = '\0';
 
@@ -142,6 +176,10 @@ joined_strs_t *read_strings(FILE* fp)
         {
             if (last_c == STR_SEP)
             {
+                /*
+                 * The input ends with a STR_SEP, the actual
+                 * number of total strings must be decreased.
+                 */
                 num_strings--;
             }
 
@@ -152,6 +190,9 @@ joined_strs_t *read_strings(FILE* fp)
         {
             if (last_c == STR_SEP)
             {
+                /*
+                 * That's an empty string.
+                 */
                 continue;
             }
 
@@ -160,6 +201,10 @@ joined_strs_t *read_strings(FILE* fp)
 
             if (!check_end_sym(end_sym))
             {
+                /*
+                 * The current end symbol is invalid.
+                 * There are too many strings.
+                 */
                 free(str);
                 return NULL;
             }
@@ -187,7 +232,7 @@ joined_strs_t *read_strings(FILE* fp)
 
     str[len++] = '\0';
 
-    joined_strs_t *res = malloc(sizeof(joined_strs_t));
+    joined_strs_t *res = malloc(sizeof(joined_strs_t)); // shrink down
     res->num_strings = num_strings;
     res->ptr = realloc(str, len); // sizeof(char)
 
