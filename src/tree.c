@@ -1,7 +1,5 @@
 #include "tree.h"
 
-
-
 node_t *new_node(int left, int right)
 {
     node_t *n = malloc(sizeof(node_t));
@@ -69,17 +67,41 @@ tree_t *new_tree(char *str, int num_strings)
     return tree;
 }
 
+/*
+ * Checks if a char is considered an 'end symbol'.
+ *
+ * The end symbols are unique characters that are
+ * appended at the end of every strings to delimitate
+ * them.
+ *
+ * Those characters shouldn't appear inside the strings.
+ */
 bool is_end_sym(char c)
 {
     return c < 31 || c > SCHAR_MAX;
 }
 
+/*
+ * The last character of every leaf should be an
+ * end symbol.
+ *
+ * Those symbols identify the strings, so we can
+ * convert them to unique indexes.
+ *
+ * Every string has a string index if the
+ * end symbols were set correctly.
+ *
+ * This index must go from 0 to num_strings - 1
+ * in order to fill str_idx_to_leaf_list properly.
+ */
 int get_leaf_str_idx(tree_t *tree, node_t *node)
 {
     return - tree->str[node->right_label] - 1;
 }
 
 /*
+ * Given two nodes finds the LCA.
+ *
  * TODO: efficient implementation
  */
 node_t *lca(node_t *n1, node_t *n2)
@@ -99,6 +121,10 @@ node_t *lca(node_t *n1, node_t *n2)
     }
 }
 
+/*
+ * Given a node, sets node->num_leaves for that node
+ * and recursively for all its children.
+ */
 int process_num_leaves(node_t *node)
 {
     node_t *first_child = node->first_child;
@@ -120,6 +146,9 @@ int process_num_leaves(node_t *node)
     return node->num_leaves;
 }
 
+/*
+ * Given a node, frees its children.
+ */
 void free_children(node_t *node)
 {
     node_t *cur = node->first_child;
@@ -137,12 +166,28 @@ void free_children(node_t *node)
     node->first_child = NULL;
 }
 
+/*
+ * C(v)           = S(v)       - U(v)
+ * uniq_str_count = num_leaves - corr_fac
+ *
+ * corr_fac = n->lca_count + sum(lca_count of every child of n)
+ *
+ * Given node 'n':
+ * - processes recursively the correction factors
+ *      of the entire subtree rooted in 'n'
+ * - sets the 'uniq_str_count' for every processed node
+ * - returns the corr_fac of 'n'
+ *
+ * The 'uniq_str_count' is the number of the strings
+ * that shares the current node.
+ */
 int process_corr_fac(node_t *node)
 {
     node_t *first_child = node->first_child;
 
     if (first_child == NULL)
     {
+        // lca_count is 0 for every leaf
         return 0;
     }
 
@@ -163,6 +208,17 @@ int process_corr_fac(node_t *node)
 
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
 
+/*
+ * Since 'uniq_str_count' represents the number of strings
+ * that share a single node, it goes from 1 to tree->num_strings.
+ *
+ * A node with uniq_str_count = 1 represents a substring common to
+ * a single string, while a node with uniq_str_count = num_strings
+ * represents a substring common to all given strings.
+ *
+ * tree->str_count_to_max_depth hold an array that stores
+ * the max depth for every uniq_str_count = 1 .. num_strings.
+ */
 void fill_str_count_to_max_depth(tree_t *tree, node_t *node)
 {
     if (node == NULL)
@@ -179,22 +235,23 @@ void fill_str_count_to_max_depth(tree_t *tree, node_t *node)
     fill_str_count_to_max_depth(tree, node->first_child);
 }
 
+/*
+ * Sets 'uniq_str_count' for every node in tree.
+ */
 void compute_uniq_str_count(tree_t *tree)
 {
     // C(v)           = S(v)       - U(v)
     // uniq_str_count = num_leaves - corr_fac
     process_corr_fac(tree->root);
-
-    tree->str_count_to_max_depth = calloc(tree->num_strings + 1, sizeof(int));
-
-    for (int i = 0; i <= tree->num_strings; i++)
-    {
-        tree->str_count_to_max_depth[i] = 0;
-    }
-
-    fill_str_count_to_max_depth(tree, tree->root);
 }
 
+/*
+ * For every string we have a list of leafs
+ * in tree->str_idx_to_leaf_list.
+ *
+ * We get the LCA of every pair of adjacent leafs
+ * to set node->lca_count.
+ */
 void process_leaves_pair(tree_t *tree)
 {
     for (size_t i = 0; i < tree->num_strings; i++)
@@ -212,6 +269,14 @@ void process_leaves_pair(tree_t *tree)
 
 #define LABEL_LENGTH(n) ((n)->right_label - (n)->left_label + 1)
 
+/*
+ * Given node 'n':
+ * - sets n->depth
+ * - trims unwanted end symbols in leafs (xyz$vwp# -> xyz$)
+ * - adds every leaf to tree->str_idx_to_leaf_list
+ * - processes the subtree rooted in 'n'
+ * - processes the siblings of 'n'
+ */
 void post_process_node(tree_t *tree, node_t *node)
 {
     node->depth = node->parent->depth + LABEL_LENGTH(node);
@@ -237,6 +302,10 @@ void post_process_node(tree_t *tree, node_t *node)
             }
         }
 
+        /*
+         * get_leaf_str_idx() returns, for every string,
+         * a unique index that goes from 0 to num_strings.
+         */
         node_t** leafs = tree->str_idx_to_leaf_list[get_leaf_str_idx(tree, node)];
         size_t cur_idx = (size_t) leafs[0];
 
@@ -254,6 +323,16 @@ void post_process_node(tree_t *tree, node_t *node)
     }
 }
 
+/*
+ * Given tree 't':
+ * - sets n->num_leaves (for every node n)
+ * - sets n->depth (for every node n)
+ * - trims unwanted end symbols in leafs (xyz$vwp# -> xyz$)
+ * - adds every leaf to tree->str_idx_to_leaf_list
+ * - sets n->lca_count (for every node n)
+ * - sets n->uniq_str_count (for every node n)
+ * - sets t->str_count_to_max_depth
+ */
 void post_process_tree(tree_t *tree)
 {
     process_num_leaves(tree->root);
@@ -269,9 +348,18 @@ void post_process_tree(tree_t *tree)
     post_process_node(tree, tree->root);
     process_leaves_pair(tree);
     compute_uniq_str_count(tree);
+
+    tree->str_count_to_max_depth = calloc(tree->num_strings + 1, sizeof(int));
+
+    for (int i = 0; i <= tree->num_strings; i++)
+    {
+        tree->str_count_to_max_depth[i] = 0;
+    }
+
+    fill_str_count_to_max_depth(tree, tree->root);
 }
 
-void fill_lcss(tree_t *tree, int target_len, int range, node_list_t **arr_lst, node_t *node)
+void fill_commons(tree_t *tree, int target_len, int range, node_list_t **arr_lst, node_t *node)
 {
     if (node == NULL)
     {
@@ -296,8 +384,8 @@ void fill_lcss(tree_t *tree, int target_len, int range, node_list_t **arr_lst, n
         arr_lst[node->uniq_str_count] = new_node;
     }
 
-    fill_lcss(tree, target_len, range, arr_lst, node->next_sibling);
-    fill_lcss(tree, target_len, range, arr_lst, node->first_child);
+    fill_commons(tree, target_len, range, arr_lst, node->next_sibling);
+    fill_commons(tree, target_len, range, arr_lst, node->first_child);
 }
 
 node_list_t **get_commons_by_length(tree_t *tree, int target_len, int range)
@@ -311,7 +399,7 @@ node_list_t **get_commons_by_length(tree_t *tree, int target_len, int range)
         arr_lst[i]->next = NULL;
     }
 
-    fill_lcss(tree, target_len, range, arr_lst, tree->root);
+    fill_commons(tree, target_len, range, arr_lst, tree->root);
 
     return arr_lst;
 }
