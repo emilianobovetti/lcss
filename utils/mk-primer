@@ -13,7 +13,7 @@ primer_seed="$2"
 norm_str="$(normalize-fasta "$fasta_dir")"
 
 function fuzzy_search {
-    local esc_regexp='\x1b\[[0-9;]*m'
+    local esc_seq="\x1b\[[0-9;]*m"
 
     #
     # Since tre-agrep doesn't seem to have a -o
@@ -22,7 +22,7 @@ function fuzzy_search {
     # sequences using sed.
     #
     tre-agrep --color -6 -D 9 -I 9 "$1" |
-    sed "s/\(.*\)$esc_regexp\(.*\)$esc_regexp\(.*\)/\2/g" |
+    sed "s/\(.*\)$esc_seq\(.*\)$esc_seq\(.*\)/\2/g" |
     sort |
     uniq
 }
