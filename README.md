@@ -11,4 +11,4 @@
 - [GNU Make](https://www.gnu.org/software/make/)
 - [GNU Bash](https://www.gnu.org/software/bash/)
 - [python3](https://www.python.org/)
-- [colout](https://github.com/nojhan/colout)
+- [tre-agrep](https://github.com/laurikari/tre)
