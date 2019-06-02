@@ -21,6 +21,8 @@ function fuzzy_search {
     # and then keep only the text inside escape
     # sequences using sed.
     #
+    # TODO: take distance as argument
+    #
     tre-agrep --color -6 -D 9 -I 9 "$1" |
     sed "s/\(.*\)$esc_seq\(.*\)$esc_seq\(.*\)/\2/g" |
     sort |

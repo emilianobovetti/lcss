@@ -18,86 +18,79 @@ aagcagtagacgaaatcgaatc
 ============================================================
 ============================================================
 
-1. gcgaaacagcagaagtgagg
+./utils/mk-primer ../sequenze res_i
 
-./utils/normalize-fasta ../sequenze |
-tre-agrep --color -6 -D 9 -I 9 -S 1 gcgaaacagcagaagtgagg |
-grep -o $'\E\\[01;31m.*\E\\[00m' | sort | uniq
+matches: 41
+degeneracy: 1536
+g[act][ag]aa[ag]c[ag]g[ac]agaa[cg][at]g[ag][ag][ag]
 
-gaaaaacggcagaactgaaa
-gcgaaacagcagaagtgagg
-gcgagacagcattattgtcg
-gcgatacgacggaagtgata
-gtgaagcagaagaagaggag
+matches: 41
+degeneracy: 18432
+g[ac][ag]a[agt]ac[ag][ag]c[ag][gt][at]a[cgt]tg[at][acgt][ag]
 
-| ./utils/regex-compiler
+matches: 42
+degeneracy: 64
+cc[cg]cgcag[at]tac[at]g[cg]a[at][ct]aa
 
-# d = 331776
-g[act][ag]a[agt][ag]c[ag][ag][ac][ag][gt][at]a[cgt][at]g[agt][acgt][ag] # 43
+matches: 42
+degeneracy: 2304
+c[ct][cgt]cgca[ag][at][gt]ac[at]g[cg][ac][agt][ct]aa
 
-gcgaaacagcagaagtgagg
-gcgagacagcattattgtcg
-gcgatacgacggaagtgata
-gtgaagcagaagaagaggag
+matches: 42
+degeneracy: 41472
+g[act][ag]a[ag][ag]c[ag]g[ac]a[gt][at]a[cgt][at]g[agt][acg][ag]
 
-# d = 73728
-g[ct]ga[agt][ag]c[ag][ag][ac][ag][gt][at]a[gt][at]g[agt][acgt][ag] # 41
+matches: 43
+degeneracy: 1536
+[ct]c[cg][cg]gca[gt][agt]tac[at]g[cg]a[at][ct][ac]a
 
-gcgaaacagcagaagtgagg
-gcgagacagcattattgtcg
-gcgatacgacggaagtgata
+matches: 43
+degeneracy: 41472
+[ct][ct][cgt][cg]gca[agt][agt][gt]ac[at]g[cg][ac][agt][ct][ac]a
 
-# d = 2304
-gcga[agt]ac[ag][ag]c[ag][gt][at]a[gt]tg[at][cgt][ag] # 39
+matches: 43
+degeneracy: 331776
+g[act][ag]a[agt][ag]c[ag][ag][ac][ag][gt][at]a[cgt][at]g[agt][acgt][ag]
 
-============================================================
+matches: 45
+degeneracy: 31104
+[ac][acg]aaa[ac][acg][cg]c[ac][ag][ag]a[cgt]tg[agt][agt][ag]
 
-2. gcagtagacgaaatcgaatc
+matches: 45
+degeneracy: 139968
+[ac][acg]a[at]a[ac][acg][acg]c[acg][ag][ag]a[cgt]tg[agt][agt][ag]
 
-./utils/normalize-fasta ../sequenze |
-tre-agrep --color -6 -D 9 -I 9 -S 1 gcagtagacgaaatcgaatc |
-grep -o $'\E\\[01;31m.*\E\\[00m' | sort | uniq |
-./utils/regex-compiler
+matches: 46
+degeneracy: 331776
+[ac][acg]aa[ag][ac][acg][cg]c[ac][ag][acg]a[acgt]t[cg][acgt][agt][ag]
 
-# d = 3072
-gc[at][ag][ct]a[ag]a[ct][gt]aaa[ct][ac][gt][ac]at[cgt] # 39
+matches: 46
+degeneracy: 373248
+[act][acg]aa[ag][ac][acg][cg][ac][ac][ag][ag]a[cgt][at]g[agt][agt][ag]
 
-============================================================
+matches: 46
+degeneracy: 995328
+[ac][acg]aa[agt][ac][acg][cg]c[ac][ag][acg]a[acgt][at][cg][acgt][agt][ag]
 
-3. ggaaatctcgttccgtatcg
+matches: 46
+degeneracy: 1492992
+[ac][acg]a[at][ag][ac][acg][acg]c[acg][ag][acg]a[acgt]t[cg][acgt][agt][ag]
 
-# d = 64
-[cg]gaaatc[at][ct]gttc[ct]g[gt][at]tcg # 38
-# d = 1536
-[cg][ag]aaa[gt]c[at][cgt][gt][ct]tc[ct]g[gt][at]tcg # 39
-# d = 27648
-[cg][ag]aa[at][gt]c[act][cgt][gt][act]t[ct][ct]g[gt][at][at]cg # 41
+matches: 47
+degeneracy: 1990656
+[act][acg]aa[ag][ac][acg][cg][ac][ac][ag][acg]a[acgt][at][cg][acgt][agt][ag]
 
-============================================================
+matches: 47
+degeneracy: 2985984
+[act][acg]aa[agt][ac][acg][cg][ac][ac][ag][acg]a[acgt][at][cg][acgt][agt][ag]
 
-4. ccccgcagttactggattaa
+matches: 47
+degeneracy: 4478976
+[ac][acg]a[at][agt][ac][acg][acg]c[acg][ag][acg]a[acgt][at][cg][acgt][agt][ag]
 
-# d = 41472
-[ct][ct][cgt][cg]gca[agt][agt][gt]ac[at]g[cg][ac][agt][ct][ac]a # 43
-
-============================================================
-
-5. cgaaacagcagaagtgagg
-
-# d = 13_436_928
-[act][acg]a[at][agt][ac][acg][acg][ac][acg][ag][acg]a[acgt][at][cg][acgt][agt][ag] # 47
-
-printf "cgaaacagcagaagtgagg\ncgaaaccgccagagtggtg" | ./utils/regex-compiler
-
-
-cgaaacagcagaagtgagg,aaaaacggcagaactgaaa
-cgaaacagcagaagtgagg,ccaaaaaccaggattgtgg
-cgaaacagcagaagtgagg,cgaaacagcagaagtgagg
-cgaaacagcagaagtgagg,cgaaaccgccagagtggtg
-cgaaacagcagaagtgagg,cgaagaagcagcaatccgg
-cgaaacagcagaagtgagg,cgaatcaccagaaaagtga
-cgaaacagcagaagtgagg,cgatacgacggaagtgata
-cgaaacagcagaagtgagg,tgaagcagaagaagaggag
+matches: 47
+degeneracy: 13436928
+[act][acg]a[at][agt][ac][acg][acg][ac][acg][ag][acg]a[acgt][at][cg][acgt][agt][ag]
 
 ============================================================
 ============================================================
