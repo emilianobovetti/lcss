@@ -74,6 +74,32 @@ gc[at][ag][ct]a[ag]a[ct][gt]aaa[ct][ac][gt][ac]at[cgt] # 39
 [cg][ag]aa[at][gt]c[act][cgt][gt][act]t[ct][ct]g[gt][at][at]cg # 41
 
 ============================================================
+
+4. ccccgcagttactggattaa
+
+# d = 41472
+[ct][ct][cgt][cg]gca[agt][agt][gt]ac[at]g[cg][ac][agt][ct][ac]a # 43
+
+============================================================
+
+5. cgaaacagcagaagtgagg
+
+# d = 13_436_928
+[act][acg]a[at][agt][ac][acg][acg][ac][acg][ag][acg]a[acgt][at][cg][acgt][agt][ag] # 47
+
+printf "cgaaacagcagaagtgagg\ncgaaaccgccagagtggtg" | ./utils/regex-compiler
+
+
+cgaaacagcagaagtgagg,aaaaacggcagaactgaaa
+cgaaacagcagaagtgagg,ccaaaaaccaggattgtgg
+cgaaacagcagaagtgagg,cgaaacagcagaagtgagg
+cgaaacagcagaagtgagg,cgaaaccgccagagtggtg
+cgaaacagcagaagtgagg,cgaagaagcagcaatccgg
+cgaaacagcagaagtgagg,cgaatcaccagaaaagtga
+cgaaacagcagaagtgagg,cgatacgacggaagtgata
+cgaaacagcagaagtgagg,tgaagcagaagaagaggag
+
+============================================================
 ============================================================
 
 # 1.1 gcgaaacagcagaagtgagg

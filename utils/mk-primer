@@ -1,0 +1,47 @@
+#!/bin/bash
+
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/mk-env" --
+
+if [ ! -d "$1" ] || [ -z "$2" ]; then
+    echo "$(basename $0) fasta-dir primer-seed"
+    exit 1
+fi
+
+fasta_dir="$1"
+primer_seed="$2"
+
+norm_str="$(normalize-fasta "$fasta_dir")"
+
+function fuzzy_search {
+    local esc_regexp='\x1b\[[0-9;]*m'
+
+    tre-agrep --color -6 -D 9 -I 9 "$1" |
+    sed "s/\(.*\)$esc_regexp\(.*\)$esc_regexp\(.*\)/\2/g" |
+    sort |
+    uniq
+}
+
+function count_matches {
+    echo "$norm_str" | grep -Ec "$1"
+}
+
+function count_degeneracy {
+    local deg=1
+
+    while read group; do
+        group_len="$(printf "$group" | wc -m)"
+        deg="$((deg * (group_len - 2)))"
+    done <<< "$(echo "$1" | grep -o '\[[^]]*\]')"
+
+    echo "$deg"
+}
+
+function print_primer {
+    primer="$(< /dev/stdin)"
+
+    echo "matches: $(count_matches "$primer")"
+    echo "degeneracy: $(count_degeneracy "$primer")"
+    echo "$primer"
+}
+
+echo "$norm_str" | fuzzy_search "$primer_seed" | regex-compiler | print_primer
