@@ -1,7 +1,6 @@
 #include "tree.h"
 
-#define LABEL_LENGTH(n) ((n)->right_label - (n)->left_label + 1)
-#define MAX(a, b) (((a) > (b)) ? (a) : (b))
+
 
 node_t *new_node(int left, int right)
 {
@@ -162,6 +161,8 @@ int process_corr_fac(node_t *node)
     return corr_fac;
 }
 
+#define MAX(a, b) (((a) > (b)) ? (a) : (b))
+
 void fill_str_count_to_max_depth(tree_t *tree, node_t *node)
 {
     if (node == NULL)
@@ -208,6 +209,8 @@ void process_leaves_pair(tree_t *tree)
         }
     }
 }
+
+#define LABEL_LENGTH(n) ((n)->right_label - (n)->left_label + 1)
 
 void post_process_node(tree_t *tree, node_t *node)
 {
@@ -268,16 +271,22 @@ void post_process_tree(tree_t *tree)
     compute_uniq_str_count(tree);
 }
 
-void fill_lcss(tree_t *tree, int range, node_list_t **arr_lst, node_t *node)
+void fill_lcss(tree_t *tree, int target_len, int range, node_list_t **arr_lst, node_t *node)
 {
     if (node == NULL)
     {
         return;
     }
 
-    int max_depth = tree->str_count_to_max_depth[node->uniq_str_count];
+    int target_depth = target_len;
 
-    if (abs(max_depth - node->depth) <= range)
+    if (target_len == INT_MAX)
+    {
+        // target_len = max_depth
+        target_depth = tree->str_count_to_max_depth[node->uniq_str_count];
+    }
+
+    if (abs(target_depth - node->depth) <= range)
     {
         node_list_t *new_node = malloc(sizeof(node_list_t));
 
@@ -287,11 +296,11 @@ void fill_lcss(tree_t *tree, int range, node_list_t **arr_lst, node_t *node)
         arr_lst[node->uniq_str_count] = new_node;
     }
 
-    fill_lcss(tree, range, arr_lst, node->next_sibling);
-    fill_lcss(tree, range, arr_lst, node->first_child);
+    fill_lcss(tree, target_len, range, arr_lst, node->next_sibling);
+    fill_lcss(tree, target_len, range, arr_lst, node->first_child);
 }
 
-node_list_t **get_lcss(tree_t *tree, int range)
+node_list_t **get_commons_by_length(tree_t *tree, int target_len, int range)
 {
     node_list_t **arr_lst = calloc(tree->num_strings + 1, sizeof(node_list_t*));
 
@@ -302,7 +311,7 @@ node_list_t **get_lcss(tree_t *tree, int range)
         arr_lst[i]->next = NULL;
     }
 
-    fill_lcss(tree, range, arr_lst, tree->root);
+    fill_lcss(tree, target_len, range, arr_lst, tree->root);
 
     return arr_lst;
 }
@@ -355,14 +364,14 @@ void set_melting_points(tree_t *tree)
     }
 }
 
-void fill_mps(tree_t *tree, int melting_point, int range, node_list_t **arr_lst, node_t *node)
+void fill_mps(tree_t *tree, int target_melt_pt, int range, node_list_t **arr_lst, node_t *node)
 {
     if (node == NULL)
     {
         return;
     }
 
-    if (abs(node->melting_point - melting_point) <= range)
+    if (abs(node->melting_point - target_melt_pt) <= range)
     {
         node_list_t *new_node = malloc(sizeof(node_list_t));
 
@@ -372,11 +381,11 @@ void fill_mps(tree_t *tree, int melting_point, int range, node_list_t **arr_lst,
         arr_lst[node->uniq_str_count] = new_node;
     }
 
-    fill_mps(tree, melting_point, range, arr_lst, node->next_sibling);
-    fill_mps(tree, melting_point, range, arr_lst, node->first_child);
+    fill_mps(tree, target_melt_pt, range, arr_lst, node->next_sibling);
+    fill_mps(tree, target_melt_pt, range, arr_lst, node->first_child);
 }
 
-node_list_t **get_commons_by_melting_point(tree_t *tree, int melting_point, int range)
+node_list_t **get_commons_by_melting_point(tree_t *tree, int target_melt_pt, int range)
 {
     set_melting_points(tree);
 
@@ -389,7 +398,7 @@ node_list_t **get_commons_by_melting_point(tree_t *tree, int melting_point, int 
         arr_lst[i]->next = NULL;
     }
 
-    fill_mps(tree, melting_point, range, arr_lst, tree->root);
+    fill_mps(tree, target_melt_pt, range, arr_lst, tree->root);
 
     return arr_lst;
 }

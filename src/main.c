@@ -109,7 +109,7 @@ void test_with_static_strings(void)
 
     tree_t *tree = build_tree(join->ptr, join->num_strings);
     post_process_tree(tree);
-    node_list_t **lcss = get_lcss(tree, range);
+    node_list_t **lcss = get_commons_by_length(tree, INT_MAX, range);
 
     print_node_arr_lst(tree, lcss);
 }
@@ -200,17 +200,38 @@ typedef enum selection_mode
 }
 selection_mode_t;
 
+#define STR_EQUAL(s1, s2) (strcmp((s1), (s2)) == 0)
+
 int main(int argc, char **argv)
 {
     selection_mode_t mode = LENGTH;
-    int melting_point = 0;
+    int target_melt_pt = 0;
+    int target_len = INT_MAX;
     int range = 0;
 
     for (int i = 1; i < argc; i++)
     {
         char *cur_arg = argv[i];
 
-        if (strcmp("-m", cur_arg) == 0 || strcmp("--melting-point", cur_arg) == 0)
+        if (STR_EQUAL("-l", cur_arg) || STR_EQUAL("--length", cur_arg))
+        {
+            mode = LENGTH;
+
+            if (i + 1 < argc)
+            {
+                target_len = strtol(argv[i + 1], NULL, 10);
+            }
+
+            if (target_len == 0)
+            {
+                target_len = INT_MAX;
+            }
+            else if (target_len < INT_MAX)
+            {
+                i++;
+            }
+        }
+        else if (STR_EQUAL("-m", cur_arg) || STR_EQUAL("--melting-point", cur_arg))
         {
             mode = MELTING_POINT;
             i++;
@@ -221,9 +242,9 @@ int main(int argc, char **argv)
                 return 1;
             }
 
-            melting_point = strtol(argv[i], NULL, 10);
+            target_melt_pt = strtol(argv[i], NULL, 10);
         }
-        else if (strcmp("-r", cur_arg) == 0 || strcmp("--range", cur_arg) == 0)
+        else if (STR_EQUAL("-r", cur_arg) || STR_EQUAL("--range", cur_arg))
         {
             i++;
 
@@ -258,10 +279,10 @@ int main(int argc, char **argv)
     switch (mode)
     {
         case LENGTH:
-            res_arr_lst = get_lcss(tree, range);
+            res_arr_lst = get_commons_by_length(tree, target_len, range);
             break;
         case MELTING_POINT:
-            res_arr_lst = get_commons_by_melting_point(tree, melting_point, range);
+            res_arr_lst = get_commons_by_melting_point(tree, target_melt_pt, range);
             break;
     }
 

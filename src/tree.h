@@ -71,9 +71,9 @@ void post_process_tree(tree_t *tree);
 
 bool is_end_sym(char c);
 
-node_list_t **get_lcss(tree_t *tree, int range);
+node_list_t **get_commons_by_length(tree_t *tree, int target_len, int range);
 
-node_list_t **get_commons_by_melting_point(tree_t *tree, int melting_point, int range);
+node_list_t **get_commons_by_melting_point(tree_t *tree, int target_melt_pt, int range);
 
 char *node_to_string(tree_t *tree, node_t *n);
 
