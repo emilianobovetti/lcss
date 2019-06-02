@@ -124,6 +124,8 @@ node_t *lca(node_t *n1, node_t *n2)
 /*
  * Given a node, sets node->num_leaves for that node
  * and recursively for all its children.
+ *
+ * Returns the num_leaves of the given node.
  */
 int process_num_leaves(node_t *node)
 {
