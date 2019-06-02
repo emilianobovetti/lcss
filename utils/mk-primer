@@ -15,6 +15,12 @@ norm_str="$(normalize-fasta "$fasta_dir")"
 function fuzzy_search {
     local esc_regexp='\x1b\[[0-9;]*m'
 
+    #
+    # Since tre-agrep doesn't seem to have a -o
+    # option like grep, we'll use --color option
+    # and then keep only the text inside escape
+    # sequences using sed.
+    #
     tre-agrep --color -6 -D 9 -I 9 "$1" |
     sed "s/\(.*\)$esc_regexp\(.*\)$esc_regexp\(.*\)/\2/g" |
     sort |
