@@ -17,6 +17,9 @@ elif [ -z "$1" ]; then
 elif [ "$1" != -- ]; then
     echo "unrecognized argument '$1' in mk-env" 1>&2
     exit 1
+elif [ -n "$2" ]; then
+    echo "unrecognized argument '$2' in mk-env" 1>&2
+    exit 1
 fi
 
 if [ "$(echo "$PATH" | grep -c "$UTILS_DIR")" -lt 1 ]; then
